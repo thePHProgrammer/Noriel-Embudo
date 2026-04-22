@@ -1,0 +1,6 @@
+@keyframes blink { 50% { opacity: 0; } }
+@keyframes pulse-down { 0%,100% { opacity: 0.3; } 50% { opacity: 0.9; } }
+@keyframes twinkle { 0%,100% { opacity: 0.45; } 50% { opacity: 1; } }
+@keyframes twinkle-b { 0%,100% { opacity: 0.7; } 50% { opacity: 0.3; } }
+@keyframes main-glow { 0%,100% { filter: drop-shadow(0 0 6px rgba(255,199,86,0.8)); r: 4; } 50% { filter: drop-shadow(0 0 16px rgba(255,199,86,1)); r: 4.6; } }
+@keyframes spin-slow { from { transform: rotate(0); } to { transform: rotate(360deg); } }
