@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Noriel Portfolio — Wireframes</title>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script type="text/babel" src="design-canvas.jsx"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Space Mono', monospace; background: #f0eee9; }
+  .caveat { font-family: 'Caveat', cursive; }
+</style>
+</head>
+<body>
+<script type="text/babel">
+
+// ─── color tokens ───────────────────────────────────────────
+const C = {
+  space: '#08090F',
+  spaceMid: '#12141E',
+  star: '#F5F0E8',
+  gold: '#F59E0B',
+  orange: '#F97316',
+  dim: '#3A3B4A',
+  wire: '#D1C8B8',
+  ink: '#2A2418',
+  annot: '#7C6A50',
+};
+
+// ─── tiny helpers ────────────────────────────────────────────
+const Sketch = ({ w, h, children, style = {} }) => (
+  <svg width={w} height={h} viewBox={`0 0 ${w} ${h}`} style={{ display: 'block', ...style }}>
+    {children}
+  </svg>
+);
+
+const SketchBox = ({ x, y, w, h, fill = 'none', stroke = C.wire, dash = false, r = 2 }) => (
+  <rect x={x} y={y} width={w} height={h} rx={r} fill={fill}
+    stroke={stroke} strokeWidth={1.5} strokeDasharray={dash ? '5 3' : undefined} />
+);
+
+const SketchCircle = ({ cx, cy, r, fill = 'none', stroke = C.wire, glow }) => (
+  <>
+    {glow && <circle cx={cx} cy={cy} r={r + 6} fill="none" stroke={C.gold} strokeWidth={1} opacity={0.2} />}
+    <circle cx={cx} cy={cy} r={r} fill={fill} stroke={stroke} strokeWidth={1.5} />
+  </>
+);
+
+const Note = ({ x, y, text, size = 11, color = C.gold, anchor = 'start' }) => (
+  <text x={x} y={y} fontFamily="Caveat, cursive" fontSize={size} fill={color} textAnchor={anchor}>{text}</text>
+);
+
+const Label = ({ x, y, text, size = 10, color = C.wire, anchor = 'start', bold }) => (
+  <text x={x} y={y} fontFamily="Space Mono, monospace" fontSize={size} fill={color}
+    textAnchor={anchor} fontWeight={bold ? 700 : 400}>{text}</text>
+);
+
+const Stars = ({ w, h, count = 40, seed = 1 }) => {
+  const pts = [];
+  let s = seed;
+  for (let i = 0; i < count; i++) {
+    s = (s * 9301 + 49297) % 233280;
+    const x = (s / 233280) * w;
+    s = (s * 9301 + 49297) % 233280;
+    const y = (s / 233280) * h;
+    const r = i % 5 === 0 ? 1.2 : 0.6;
+    pts.push(<circle key={i} cx={x} cy={y} r={r} fill={C.star} opacity={0.6 + (i % 3) * 0.15} />);
+  }
+  return <>{pts}</>;
+};
+
+// ─── TAB CONTROL ─────────────────────────────────────────────
+const TABS = ['Option A — Vertical Flythrough', 'Option B — Orbital Timeline', 'Option C — Big Bang Radial'];
+
+// ─── WIREFRAME OPTION A ─ Vertical scroll flythrough ─────────
+// User scrolls down; camera flies through space; each section = planet encounter
+function WireA() {
+  const W = 380, H = 700;
+  return (
+    <DCArtboard label="Option A — Vertical Scroll Flythrough" width={W} height={H}>
+      <Sketch w={W} h={H}>
+        {/* space bg */}
+        <rect width={W} height={H} fill={C.space} />
+        <Stars w={W} h={H} count={60} seed={42} />
+
+        {/* ── SCREEN 1: Big Bang ── */}
+        {/* glow burst */}
+        <circle cx={190} cy={90} r={50} fill="none" stroke={C.gold} strokeWidth={1} opacity={0.15} />
+        <circle cx={190} cy={90} r={30} fill="none" stroke={C.gold} strokeWidth={1} opacity={0.25} />
+        <circle cx={190} cy={90} r={14} fill={C.gold} opacity={0.9} />
+        {/* burst rays */}
+        {[0,30,60,90,120,150,180,210,240,270,300,330].map((a,i) => {
+          const rad = a * Math.PI / 180;
+          return <line key={i}
+            x1={190 + Math.cos(rad)*14} y1={90 + Math.sin(rad)*14}
+            x2={190 + Math.cos(rad)*38} y2={90 + Math.sin(rad)*38}
+            stroke={C.gold} strokeWidth={0.8} opacity={0.5} />;
+        })}
+        <Note x={190} y={155} text="BIG BANG → origin point" size={13} anchor="middle" />
+        <Note x={190} y={172} text="NORIEL JOY EMBUDO" size={15} color={C.star} anchor="middle" />
+        <Note x={190} y={188} text="Automation Software Engineer" size={10} color={C.wire} anchor="middle" />
+
+        {/* scroll arrow */}
+        <line x1={190} y1={200} x2={190} y2={215} stroke={C.gold} strokeWidth={1.5} />
+        <line x1={185} y1={210} x2={190} y2={215} stroke={C.gold} strokeWidth={1.5} />
+        <line x1={195} y1={210} x2={190} y2={215} stroke={C.gold} strokeWidth={1.5} />
+        <Note x={190} y={230} text="scroll to travel through time →" size={10} color={C.annot} anchor="middle" />
+
+        {/* divider */}
+        <line x1={0} y1={240} x2={W} y2={240} stroke={C.dim} strokeWidth={0.5} strokeDasharray="4 4" />
+
+        {/* ── SECTION: ABOUT (Mercury-like) ── */}
+        <Note x={30} y={265} text="ABOUT" size={11} color={C.gold} />
+        <SketchCircle cx={60} cy={295} r={18} fill={C.spaceMid} stroke={C.orange} />
+        <Label x={85} y={289} text="Small rocky planet" size={9} color={C.annot} />
+        <Label x={85} y={301} text="Short bio + summary" size={9} color={C.wire} />
+        <Label x={85} y={313} text="Location + contact" size={9} color={C.wire} />
+        <SketchBox x={85} y={320} w={265} h={28} dash r={3} />
+        <Label x={190} y={338} text="[ professional summary block ]" size={8} color={C.dim} anchor="middle" />
+
+        {/* ── SECTION: SKILLS (asteroid belt) ── */}
+        <Note x={30} y={365} text="SKILLS" size={11} color={C.gold} />
+        {/* asteroid belt visual */}
+        {[0,1,2,3,4,5,6,7,8].map(i => {
+          const x = 50 + i * 32, y = 390 + (i % 2 === 0 ? -5 : 5);
+          const r = i % 3 === 0 ? 7 : 4;
+          return <circle key={i} cx={x} cy={y} r={r} fill={C.dim} stroke={C.wire} strokeWidth={1} opacity={0.8} />;
+        })}
+        <Label x={190} y={410} text="Python · n8n · UiPath · AWS · C# ..." size={8} color={C.wire} anchor="middle" />
+        <Label x={190} y={422} text="floating skill tags around belt" size={8} color={C.annot} anchor="middle" />
+
+        {/* ── SECTION: EXPERIENCE (large planets) ── */}
+        <Note x={30} y={448} text="EXPERIENCE" size={11} color={C.gold} />
+        {/* 3 planets */}
+        <SketchCircle cx={70} cy={475} r={22} fill={C.spaceMid} stroke={C.orange} glow />
+        <Label x={70} y={479} text="CUP" size={8} color={C.gold} anchor="middle" />
+        <SketchCircle cx={135} cy={480} r={16} fill={C.spaceMid} stroke={C.wire} />
+        <Label x={135} y={484} text="DFI" size={8} color={C.wire} anchor="middle" />
+        <SketchCircle cx={190} cy={477} r={11} fill={C.spaceMid} stroke={C.dim} />
+        <Label x={190} y={481} text="FS" size={7} color={C.dim} anchor="middle" />
+        <SketchBox x={215} y={458} w={145} h={40} dash r={3} />
+        <Label x={288} y={474} text="[ job title ]" size={8} color={C.dim} anchor="middle" />
+        <Label x={288} y={486} text="[ company · dates ]" size={8} color={C.dim} anchor="middle" />
+        <Label x={288} y={498} text="[ bullet achievements ]" size={8} color={C.dim} anchor="middle" />
+
+        {/* ── SECTION: PROJECTS ── */}
+        <Note x={30} y={520} text="PROJECTS" size={11} color={C.gold} />
+        <SketchCircle cx={75} cy={548} r={20} fill={C.spaceMid} stroke={C.gold} />
+        <Label x={75} y={546} text="Sirena" size={7} color={C.gold} anchor="middle" />
+        <Label x={75} y={556} text="Tech" size={7} color={C.gold} anchor="middle" />
+        <SketchCircle cx={130} cy={550} r={15} fill={C.spaceMid} stroke={C.wire} />
+        <Label x={130} y={554} text="EWO" size={7} color={C.wire} anchor="middle" />
+        <Label x={200} y={540} text="click planet →" size={9} color={C.annot} />
+        <Label x={200} y={552} text="expands project card" size={9} color={C.annot} />
+        <Label x={200} y={564} text="inline below" size={9} color={C.annot} />
+
+        {/* ── SECTION: CONTACT ── */}
+        <Note x={30} y={590} text="CONTACT" size={11} color={C.gold} />
+        <Label x={60} y={610} text="embudon@gmail.com" size={8} color={C.wire} />
+        <Label x={60} y={622} text="Quezon City, PH" size={8} color={C.wire} />
+        {/* resume button */}
+        <SketchBox x={60} y={628} w={100} h={20} r={10} stroke={C.gold} />
+        <Label x={110} y={642} text="↓ RESUME PDF" size={8} color={C.gold} anchor="middle" />
+
+        {/* flight path line */}
+        <path d={`M 30 90 Q 20 240 50 295 Q 20 390 50 460 Q 20 548 50 590`}
+          fill="none" stroke={C.gold} strokeWidth={0.8} strokeDasharray="3 5" opacity={0.4} />
+
+        {/* border */}
+        <rect width={W} height={H} fill="none" stroke={C.dim} strokeWidth={1} />
+      </Sketch>
+    </DCArtboard>
+  );
+}
+
+// ─── WIREFRAME OPTION B ─ Orbital Timeline ────────────────────
+// Horizontal scroll; a comet/ship travels along a curved path through time
+// Each planet = milestone/section along the path
+function WireB() {
+  const W = 900, H = 500;
+  return (
+    <DCArtboard label="Option B — Horizontal Orbital Timeline (scroll left → right = past → present)" width={W} height={H}>
+      <Sketch w={W} h={H}>
+        <rect width={W} height={H} fill={C.space} />
+        <Stars w={W} h={H} count={100} seed={77} />
+
+        {/* the flight PATH — a sweeping curve */}
+        <path d="M 60 250 C 160 180, 260 320, 380 240 C 490 160, 560 310, 680 240 C 760 190, 820 250, 880 240"
+          fill="none" stroke={C.gold} strokeWidth={1.5} strokeDasharray="6 4" opacity={0.5} />
+
+        {/* ── node 1: BIG BANG / origin ── */}
+        <circle cx={60} cy={250} r={28} fill={C.gold} opacity={0.9} />
+        {[0,45,90,135,180,225,270,315].map((a,i) => {
+          const rad = a * Math.PI / 180;
+          return <line key={i} x1={60+Math.cos(rad)*28} y1={250+Math.sin(rad)*28}
+            x2={60+Math.cos(rad)*44} y2={250+Math.sin(rad)*44}
+            stroke={C.gold} strokeWidth={0.8} opacity={0.4} />;
+        })}
+        <Note x={60} y={300} text="BIRTH" size={12} color={C.gold} anchor="middle" />
+        <Label x={60} y={314} text="Big Bang" size={8} color={C.wire} anchor="middle" />
+
+        {/* ── node 2: EDUCATION ── */}
+        <SketchCircle cx={200} cy={200} r={26} fill={C.spaceMid} stroke={C.wire} />
+        <Label x={200} y={196} text="EDU" size={8} color={C.wire} anchor="middle" />
+        <Label x={200} y={207} text="FEU-IT" size={7} color={C.annot} anchor="middle" />
+        <SketchBox x={155} y={135} w={90} h={50} dash r={3} />
+        <Label x={200} y={152} text="BS CompSci" size={8} color={C.wire} anchor="middle" />
+        <Label x={200} y={163} text="2020 – 2024" size={8} color={C.gold} anchor="middle" />
+        <Label x={200} y={174} text="Specialization in" size={7} color={C.annot} anchor="middle" />
+        <Label x={200} y={184} text="Soft. Engineering" size={7} color={C.annot} anchor="middle" />
+        {/* connector */}
+        <line x1={200} y1={185} x2={200} y2={174} stroke={C.wire} strokeWidth={0.8} strokeDasharray="3 2" />
+
+        {/* ── node 3: SKILLS asteroid belt ── */}
+        <Note x={325} y={135} text="SKILLS" size={11} color={C.gold} anchor="middle" />
+        {[0,1,2,3,4].map(i => {
+          const cx = 295 + i * 15, cy = 255 + (i%2===0?-12:12);
+          return <circle key={i} cx={cx} cy={cy} r={5+i%2*2} fill={C.dim} stroke={C.wire} strokeWidth={1} />;
+        })}
+        <Label x={325} y={280} text="hover = skill name" size={8} color={C.annot} anchor="middle" />
+
+        {/* ── node 4: PROJECTS moon ── */}
+        <SketchCircle cx={440} cy={210} r={30} fill={C.spaceMid} stroke={C.orange} glow />
+        <Label x={440} y={206} text="PROJECTS" size={7} color={C.orange} anchor="middle" />
+        <Label x={440} y={217} text="SirenaTech" size={7} color={C.wire} anchor="middle" />
+        {/* mini moon orbiting */}
+        <circle cx={470} cy={195} r={8} fill={C.spaceMid} stroke={C.wire} strokeWidth={1} />
+        <Label x={470} y={199} text="EWO" size={6} color={C.dim} anchor="middle" />
+        <path d="M 410 210 A 30 20 -15 1 1 470 210" fill="none" stroke={C.dim} strokeWidth={0.8} strokeDasharray="3 2" />
+        <SketchBox x={390} y={260} w={100} h={45} dash r={3} />
+        <Label x={440} y={276} text="project card" size={8} color={C.dim} anchor="middle" />
+        <Label x={440} y={288} text="tech tags + link" size={8} color={C.dim} anchor="middle" />
+        <Label x={440} y={299} text="↑ click planet" size={8} color={C.annot} anchor="middle" />
+
+        {/* ── node 5: EXPERIENCE gas giant ── */}
+        <SketchCircle cx={620} cy={220} r={38} fill={C.spaceMid} stroke={C.orange} />
+        {/* rings */}
+        <ellipse cx={620} cy={220} rx={56} ry={12} fill="none" stroke={C.orange} strokeWidth={1} opacity={0.4} />
+        <Label x={620} y={216} text="WORK" size={8} color={C.orange} anchor="middle" />
+        <Label x={620} y={227} text="EXPERIENCE" size={7} color={C.wire} anchor="middle" />
+        {/* 3 moons */}
+        <circle cx={590} cy={170} r={10} fill={C.spaceMid} stroke={C.wire} strokeWidth={1} />
+        <Label x={590} y={174} text="CUP" size={7} color={C.gold} anchor="middle" />
+        <circle cx={625} cy={160} r={8} fill={C.spaceMid} stroke={C.wire} strokeWidth={1} />
+        <Label x={625} y={164} text="DFI" size={7} color={C.wire} anchor="middle" />
+        <circle cx={658} cy={172} r={6} fill={C.spaceMid} stroke={C.dim} strokeWidth={1} />
+        <Label x={658} y={176} text="FS" size={6} color={C.dim} anchor="middle" />
+        <SketchBox x={550} y={276} w={140} h={50} dash r={3} />
+        <Label x={620} y={292} text="[ role · company ]" size={8} color={C.dim} anchor="middle" />
+        <Label x={620} y={304} text="[ dates · key wins ]" size={8} color={C.dim} anchor="middle" />
+        <Label x={620} y={316} text="[ 100k+ hrs saved ]" size={8} color={C.gold} anchor="middle" />
+
+        {/* ── node 6: CONTACT / present day ── */}
+        <SketchCircle cx={840} cy={245} r={22} fill={C.spaceMid} stroke={C.gold} glow />
+        <Label x={840} y={241} text="NOW" size={8} color={C.gold} anchor="middle" />
+        <Label x={840} y={252} text="2026" size={8} color={C.wire} anchor="middle" />
+        <Note x={840} y={290} text="CONTACT" size={12} color={C.gold} anchor="middle" />
+        <SketchBox x={790} y={296} w={100} h={22} r={11} stroke={C.gold} />
+        <Label x={840} y={311} text="↓ RESUME PDF" size={8} color={C.gold} anchor="middle" />
+
+        {/* comet/ship icon on path */}
+        <polygon points="355,245 348,241 348,249" fill={C.gold} />
+        <line x1={325} y1={245} x2={350} y2={245} stroke={C.gold} strokeWidth={1.5} opacity={0.6} />
+        <Note x={355} y={235} text="← you are here" size={10} color={C.gold} />
+
+        {/* year labels */}
+        <Label x={60}  y={455} text="2020" size={9} color={C.dim} anchor="middle" />
+        <Label x={200} y={455} text="2020–24" size={9} color={C.dim} anchor="middle" />
+        <Label x={440} y={455} text="2023–24" size={9} color={C.dim} anchor="middle" />
+        <Label x={620} y={455} text="2024–now" size={9} color={C.dim} anchor="middle" />
+        <Label x={840} y={455} text="now" size={9} color={C.dim} anchor="middle" />
+
+        {/* timeline axis */}
+        <line x1={60} y1={445} x2={880} y2={445} stroke={C.dim} strokeWidth={0.8} />
+        {[60,200,380,440,620,840].map(x => (
+          <line key={x} x1={x} y1={440} x2={x} y2={450} stroke={C.dim} strokeWidth={0.8} />
+        ))}
+
+        {/* scroll hint */}
+        <Note x={450} y={485} text="← scroll through time →" size={14} color={C.annot} anchor="middle" />
+
+        <rect width={W} height={H} fill="none" stroke={C.dim} strokeWidth={1} />
+      </Sketch>
+    </DCArtboard>
+  );
+}
+
+// ─── WIREFRAME OPTION C ─ Big Bang Radial ────────────────────
+// All content radiates OUT from a central big bang point.
+// Scroll = zoom out to reveal more of the universe.
+// Sections on radial arms, like a galaxy map.
+function WireC() {
+  const W = 700, H = 700;
+  const cx = 350, cy = 360;
+
+  // section arms at different angles
+  const sections = [
+    { label: 'ABOUT',      angle: -80,  dist: 150, r: 28, color: C.orange },
+    { label: 'EDUCATION',  angle: -20,  dist: 180, r: 24, color: C.wire },
+    { label: 'SKILLS',     angle: 35,   dist: 170, r: 32, color: C.wire },
+    { label: 'EXPERIENCE', angle: 100,  dist: 200, r: 40, color: C.orange, ring: true },
+    { label: 'PROJECTS',   angle: 155,  dist: 175, r: 30, color: C.gold },
+    { label: 'BLOG',       angle: 205,  dist: 160, r: 20, color: C.dim },
+    { label: 'CONTACT',    angle: 255,  dist: 190, r: 22, color: C.gold },
+  ];
+
+  return (
+    <DCArtboard label="Option C — Big Bang Radial (scroll out to reveal the full universe)" width={W} height={H}>
+      <Sketch w={W} h={H}>
+        <rect width={W} height={H} fill={C.space} />
+        <Stars w={W} h={H} count={90} seed={13} />
+
+        {/* outer glow rings */}
+        {[260, 220, 180].map(r => (
+          <circle key={r} cx={cx} cy={cy} r={r} fill="none" stroke={C.gold} strokeWidth={0.5} opacity={0.06} />
+        ))}
+
+        {/* arms from center */}
+        {sections.map((s, i) => {
+          const rad = s.angle * Math.PI / 180;
+          const px = cx + Math.cos(rad) * s.dist;
+          const py = cy + Math.sin(rad) * s.dist;
+          return (
+            <line key={i}
+              x1={cx} y1={cy}
+              x2={px} y2={py}
+              stroke={C.dim} strokeWidth={0.8} strokeDasharray="4 4" />
+          );
+        })}
+
+        {/* section planets */}
+        {sections.map((s, i) => {
+          const rad = s.angle * Math.PI / 180;
+          const px = cx + Math.cos(rad) * s.dist;
+          const py = cy + Math.sin(rad) * s.dist;
+          // label direction
+          const lx = px + Math.cos(rad) * (s.r + 18);
+          const ly = py + Math.sin(rad) * (s.r + 12);
+          const anchor = lx < cx - 20 ? 'end' : lx > cx + 20 ? 'start' : 'middle';
+          return (
+            <g key={i}>
+              {s.ring && (
+                <ellipse cx={px} cy={py} rx={s.r + 14} ry={s.r * 0.35}
+                  fill="none" stroke={s.color} strokeWidth={1} opacity={0.35}
+                  transform={`rotate(${s.angle}, ${px}, ${py})`} />
+              )}
+              <circle cx={px} cy={py} r={s.r} fill={C.spaceMid} stroke={s.color} strokeWidth={1.5} />
+              <Note x={lx} y={ly} text={s.label} size={11} color={s.color} anchor={anchor} />
+            </g>
+          );
+        })}
+
+        {/* ── CENTER: Big Bang / Sun ── */}
+        {[55, 40, 28, 18].map((r, i) => (
+          <circle key={r} cx={cx} cy={cy} r={r} fill="none" stroke={C.gold} strokeWidth={1}
+            opacity={[0.08, 0.12, 0.25, 0.6][i]} />
+        ))}
+        <circle cx={cx} cy={cy} r={12} fill={C.gold} />
+        <Label x={cx} y={cy + 4} text="NJE" size={9} color={C.space} anchor="middle" bold />
+
+        {/* name block */}
+        <Note x={cx} y={cy - 75} text="NORIEL JOY EMBUDO" size={16} color={C.star} anchor="middle" />
+        <Label x={cx} y={cy - 55} text="AUTOMATION SOFTWARE ENGINEER" size={8} color={C.annot} anchor="middle" />
+
+        {/* expanded card example for EXPERIENCE */}
+        {(() => {
+          const s = sections[3]; // EXPERIENCE
+          const rad = s.angle * Math.PI / 180;
+          const px = cx + Math.cos(rad) * s.dist;
+          const py = cy + Math.sin(rad) * s.dist;
+          return (
+            <g>
+              <SketchBox x={px + s.r + 8} y={py - 40} w={160} h={90} dash r={4} />
+              <Label x={px + s.r + 88} y={py - 26} text="[ click to expand ]" size={7} color={C.dim} anchor="middle" />
+              <Label x={px + s.r + 88} y={py - 14} text="CUP · Jan 2026–Now" size={7} color={C.gold} anchor="middle" />
+              <Label x={px + s.r + 88} y={py}     text="DFI · Aug 2024–Jan 2026" size={7} color={C.wire} anchor="middle" />
+              <Label x={px + s.r + 88} y={py + 12} text="FactSet · Apr–Jul 2024" size={7} color={C.wire} anchor="middle" />
+              <Label x={px + s.r + 88} y={py + 28} text="100k+ hrs automated" size={7} color={C.orange} anchor="middle" />
+              <Label x={px + s.r + 88} y={py + 42} text="↑ detail panel slides in" size={7} color={C.annot} anchor="middle" />
+            </g>
+          );
+        })()}
+
+        {/* scroll hint */}
+        <Note x={cx} y={H - 20} text="scroll out → universe expands → reveals more sections" size={11} color={C.annot} anchor="middle" />
+
+        {/* resume btn */}
+        <SketchBox x={cx - 55} y={H - 55} w={110} h={24} r={12} stroke={C.gold} />
+        <Label x={cx} y={H - 39} text="↓ DOWNLOAD RESUME" size={8} color={C.gold} anchor="middle" />
+
+        <rect width={W} height={H} fill="none" stroke={C.dim} strokeWidth={1} />
+      </Sketch>
+    </DCArtboard>
+  );
+}
+
+// ─── ANNOTATIONS ─────────────────────────────────────────────
+function Annotations() {
+  return (
+    <>
+      <DCPostIt top={10} left={10} rotate={-1} width={200}>
+        <b>Option A:</b> Classic scroll-down journey. Simplest to build. Each section feels like landing on a planet.
+      </DCPostIt>
+      <DCPostIt top={10} left={430} rotate={1} width={220}>
+        <b>Option B:</b> Timeline as spaceflight. Best for showing career progression. Works great with the "fly through time" idea.
+      </DCPostIt>
+      <DCPostIt top={10} left={1370} rotate={-2} width={200}>
+        <b>Option C:</b> Most dramatic. Full galaxy map. Best "big bang" visual metaphor. More complex UX.
+      </DCPostIt>
+      <DCPostIt top={430} left={10} rotate={2} width={185}>
+        💡 Can mix: B layout + A planet detail panels
+      </DCPostIt>
+    </>
+  );
+}
+
+// ─── APP ──────────────────────────────────────────────────────
+function App() {
+  const [tab, setTab] = React.useState(1); // B is the recommended default
+
+  return (
+    <div style={{ width: '100vw', height: '100vh', display: 'flex', flexDirection: 'column' }}>
+      {/* tab bar */}
+      <div style={{
+        display: 'flex', gap: 0, background: '#1A1B26', zIndex: 10,
+        borderBottom: '1px solid #2A2B36', padding: '0 16px',
+      }}>
+        {TABS.map((t, i) => (
+          <button key={i} onClick={() => setTab(i)} style={{
+            background: tab === i ? '#2A2B36' : 'transparent',
+            border: 'none', borderBottom: tab === i ? `2px solid ${C.gold}` : '2px solid transparent',
+            color: tab === i ? C.star : C.annot,
+            fontFamily: 'Space Mono, monospace', fontSize: 11, padding: '10px 18px',
+            cursor: 'pointer', transition: 'all 0.15s',
+          }}>{t}</button>
+        ))}
+        <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center',
+          fontFamily: 'Caveat, cursive', fontSize: 14, color: C.annot, paddingRight: 8 }}>
+          drag to pan · scroll to zoom
+        </div>
+      </div>
+
+      {/* canvas */}
+      <div style={{ flex: 1, overflow: 'hidden' }}>
+        <DesignCanvas>
+          {tab === 0 && (
+            <DCSection title="Option A — Vertical Flythrough" subtitle="Classic top-to-bottom scroll. Big Bang intro → fly past each section as a planet. Most familiar pattern.">
+              <WireA />
+              <DCPostIt top={60} left={420} rotate={2} width={220}>
+                <b>Big Bang</b> plays on load → particles form title. Then user scrolls down to "travel through time."
+              </DCPostIt>
+              <DCPostIt top={260} left={420} rotate={-1} width={200}>
+                Flight path line traces your journey. Each planet = a section. Click = zoom in for detail.
+              </DCPostIt>
+            </DCSection>
+          )}
+          {tab === 1 && (
+            <DCSection title="Option B — Horizontal Orbital Timeline ★ Recommended" subtitle="Scroll left→right through your career timeline. Each milestone is a planet on the flight path. Most cinematic — like Interstellar wormhole travel.">
+              <WireB />
+              <Annotations />
+            </DCSection>
+          )}
+          {tab === 2 && (
+            <DCSection title="Option C — Big Bang Radial Galaxy Map" subtitle="You are the sun. All sections orbit outward like a galaxy. Scroll = zoom out and reveal more of the universe. Most dramatic.">
+              <WireC />
+              <DCPostIt top={60} left={740} rotate={1} width={210}>
+                <b>Opening:</b> Only the center glows. Scroll out → arms of the galaxy slowly materialize with particle trails.
+              </DCPostIt>
+              <DCPostIt top={300} left={740} rotate={-1} width={195}>
+                Detail panels slide in from the side when you click a planet. Resume download at outer edge.
+              </DCPostIt>
+            </DCSection>
+          )}
+        </DesignCanvas>
+      </div>
+    </div>
+  );
+}
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(<App />);
+</script>
+<div id="root"></div>
+</body>
+</html>
