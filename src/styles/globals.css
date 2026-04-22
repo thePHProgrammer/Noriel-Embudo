@@ -16,45 +16,49 @@ body:has(a:hover) #cursor-ring, body:has(button:hover) #cursor-ring { width: 56p
 #starfield { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
 #bigbang-canvas { position: fixed; inset: 0; z-index: 100; pointer-events: none; }
 
-/* ── TABLET / IPAD ── */
-@media (max-width: 1024px) {
-  section { padding: 100px 48px 60px; }
-  .section-inner { gap: 48px; }
+/* ── TABLET LANDSCAPE (≤1100px) ── */
+@media (max-width: 1100px) {
+  section { padding: 100px 60px 60px; }
+  .section-inner { gap: 56px; }
   .constellation { width: 260px; height: 260px; }
-  .hero-btns { gap: 12px; }
-  #terminal { padding: 60px 48px; }
+  #terminal { padding: 60px; }
 }
 
-/* ── TABLET STACK (iPad portrait & small tablets) ── */
+/* ── TABLET / IPAD (≤860px) — single column, hide constellation ── */
 @media (max-width: 860px) {
-  section { padding: 80px 32px; }
-  .section-inner { grid-template-columns: 1fr; gap: 40px; }
+  section { padding: 80px 40px 60px; }
+  .section-inner { grid-template-columns: 1fr !important; gap: 36px; }
   .section-inner.flip { direction: ltr; }
-  .constellation { width: 220px; height: 220px; }
+  .planet-wrap { display: none; }
   .projects-grid { grid-template-columns: 1fr 1fr; }
-  .flip-card { min-height: 200px; }
-  .flip-card-inner { min-height: 200px; }
-  #terminal { padding: 60px 32px; }
+  nav { padding: 16px 32px; }
+  .nav-links { gap: 20px; }
+  .nav-links a { font-size: 11px; }
+  #terminal { padding: 60px 40px; }
+  .stat-row { gap: 28px; }
 }
 
-/* ── MOBILE ── */
+/* ── MOBILE (≤600px) ── */
 @media (max-width: 600px) {
-  section { padding: 80px 20px; }
-  .section-inner { grid-template-columns: 1fr; gap: 32px; }
+  section { padding: 72px 20px 48px; }
+  .section-inner { grid-template-columns: 1fr !important; gap: 28px; }
   .section-inner.flip { direction: ltr; }
-  nav { padding: 16px 20px; }
+  nav { padding: 14px 20px; }
   .nav-links { display: none; }
   #path-line, .path-dot { display: none; }
-  .constellation { width: 180px; height: 180px; }
-  .projects-grid { grid-template-columns: 1fr; }
-  .flip-card { min-height: 190px; }
-  .flip-card-inner { min-height: 190px; }
-  .form-row { grid-template-columns: 1fr; }
   #cursor-dot, #cursor-ring { display: none; }
   body { cursor: auto; }
-  .btn-outline, .btn-primary, .form-field input, .form-field textarea, .btn-send, .flip-card, .skill-tag, .exp-card, .cert-item { cursor: auto; }
+  .btn-outline, .btn-primary, .form-field input, .form-field textarea,
+  .btn-send, .flip-card, .skill-tag, .exp-card, .cert-item, .form-select { cursor: auto; }
+  .projects-grid { grid-template-columns: 1fr; }
+  .form-row { grid-template-columns: 1fr; }
   #terminal { padding: 40px 20px; }
-  .stat-row { gap: 24px; }
+  .stat-row { gap: 20px; flex-wrap: wrap; }
   .stat-num { font-size: 28px; }
-  .hero-btns { flex-direction: column; align-items: center; }
+  .hero-btns { flex-direction: column; align-items: center; gap: 12px; margin-bottom: 40px; }
+  .section-title { font-size: clamp(26px, 6vw, 40px); }
+  .flip-card { min-height: 200px; }
+  .flip-card-inner { min-height: 200px; }
+  .terminal-body { min-height: 240px; font-size: 12px; }
+  .exp-role { font-size: 15px; }
 }
