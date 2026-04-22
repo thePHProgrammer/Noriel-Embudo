@@ -2,7 +2,6 @@ import { useRef } from 'react';
 import { useSectionReveal } from '../../hooks/useSectionReveal';
 import { PlanetContact } from '../planet/PlanetContact';
 import { ContactForm } from '../ui/ContactForm';
-import { META } from '../../data/meta';
 
 export function Contact({ onSuccess }) {
   const sectionRef = useRef(null);
@@ -19,12 +18,9 @@ export function Contact({ onSuccess }) {
           <h2 className="section-title">Send a Signal</h2>
           <p className="section-body">Open to new missions, collaborations, and interesting problems to automate.</p>
           <p style={{ fontFamily: "'Space Mono', monospace", fontSize: '11px', color: 'var(--gold)', marginTop: '12px' }}>
-            {META.email} · Quezon City, PH
+            Quezon City, PH · Open to new missions
           </p>
           <ContactForm onSuccess={onSuccess} />
-          <a href={`mailto:${META.email}`} className="btn-outline" style={{ marginTop: '20px' }}>
-            ✉ {META.email}
-          </a>
         </div>
       </div>
     </section>

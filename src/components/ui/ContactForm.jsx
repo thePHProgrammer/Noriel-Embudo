@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { META } from '../../data/meta';
 
 export function ContactForm({ onSuccess }) {
   const [fields, setFields] = useState({ name: '', email: '', message: '' });
@@ -14,7 +13,7 @@ export function ContactForm({ onSuccess }) {
     setSubmitting(true);
     try {
       const fd = new FormData();
-      fd.append('access_key', META.web3formsKey);
+      fd.append('access_key', import.meta.env.VITE_WEB3FORMS_KEY);
       fd.append('subject', 'Portfolio Contact — Noriel Joy Embudo');
       fd.append('name', fields.name);
       fd.append('email', fields.email);
