@@ -14,9 +14,9 @@ nav.visible { opacity: 1; }
 .path-dot { position: fixed; left: 36px; width: 9px; height: 9px; border-radius: 50%; background: var(--gold); z-index: 11; box-shadow: 0 0 10px var(--gold); transform: translateY(-50%); transition: top 0.08s linear; opacity: 0; }
 
 /* ── SECTIONS ── */
-section { position: relative; z-index: 1; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 120px 80px 80px; opacity: 0; transform: translateY(30px); transition: opacity 0.9s ease, transform 0.9s ease; }
+section { position: relative; z-index: 1; min-height: auto; display: flex; align-items: center; justify-content: center; padding: 120px 80px 80px; opacity: 0; transform: translateY(30px); transition: opacity 0.9s ease, transform 0.9s ease; }
 section.visible { opacity: 1; transform: none; }
-#hero { min-height: 100vh; flex-direction: column; text-align: center; padding-top: 0; }
+#hero { min-height: 100svh; flex-direction: column; text-align: center; padding-top: 0; }
 
 /* ── HERO ── */
 .hero-eyebrow { font-family: 'Space Mono', monospace; font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--gold); margin-bottom: 28px; opacity: 0.8; }
