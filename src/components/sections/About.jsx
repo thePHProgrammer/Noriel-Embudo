@@ -9,8 +9,8 @@ function AboutBody() {
   return (
     <p className={`section-body reveal${on ? ' on' : ''}`} ref={ref}>
       Automation Software Engineer with 2+ years designing enterprise-grade workflow automation,
-      agentic AI systems, and cloud-native integrations. Based in Quezon City, Philippines —
-      deploying solutions that scale across Southeast Asia.
+      agentic AI systems, and cloud-native integrations — deploying solutions that scale across
+      Southeast Asia.
     </p>
   );
 }
