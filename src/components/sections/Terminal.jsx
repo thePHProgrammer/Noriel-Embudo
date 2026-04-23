@@ -65,9 +65,7 @@ const COMMANDS = {
   ],
   contact: () => [
     `<span class="term-gold">── CONTACT ────────────────────────────────</span>`,
-    `  Email   : <span class="term-cyan">embudon@gmail.com</span>`,
-    `  Phone   : <span class="term-hi">09610688362</span>`,
-    `  Location: <span class="term-hi">Grass Residences, Quezon City, PH</span>`,
+    `  Answer   : <span class="term-cyan">The Contact Form Below is for Contacting me</span>`,
     `  Status  : <span class="term-green">Open to new missions</span>`,
     ``,
     `  <span class="term-dim">→ Scroll to Contact section to send a message</span>`,
