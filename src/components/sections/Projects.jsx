@@ -15,7 +15,7 @@ export function Projects() {
           <PlanetProjects />
         </div>
         <div className="content-wrap">
-          <div className="section-label">03 · Projects</div>
+          <div className="section-label">04 · Projects</div>
           <h2 className="section-title">Deployed Missions</h2>
           <p style={{ fontSize: '11px', color: 'var(--dim)', fontFamily: "'Space Mono', monospace", marginBottom: '14px', letterSpacing: '.06em' }}>
             HOVER CARD TO REVEAL DETAILS

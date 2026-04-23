@@ -15,7 +15,7 @@ export function Skills() {
           <PlanetSkills />
         </div>
         <div className="content-wrap">
-          <div className="section-label">04 · Skills</div>
+          <div className="section-label">05 · Skills</div>
           <h2 className="section-title">Tech Stack</h2>
           {SKILLS.map((group, i) => (
             <SkillGroup key={i} label={group.label} items={group.items} />

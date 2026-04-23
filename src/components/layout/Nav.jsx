@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-const LINKS = ['about', 'experience', 'projects', 'skills', 'education', 'terminal', 'contact'];
+const LINKS = ['about', 'experience', 'crew', 'projects', 'skills', 'education', 'terminal', 'contact'];
 
 export function Nav({ visible }) {
   const [menuOpen, setMenuOpen] = useState(false);
