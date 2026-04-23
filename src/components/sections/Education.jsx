@@ -16,7 +16,7 @@ export function Education() {
           <PlanetEducation />
         </div>
         <div className="content-wrap">
-          <div className="section-label">05 · Education &amp; Certifications</div>
+          <div className="section-label">06 · Education &amp; Certifications</div>
           <h2 className="section-title">Academic Orbit</h2>
           <ExpCard
             role={EDUCATION.degree}

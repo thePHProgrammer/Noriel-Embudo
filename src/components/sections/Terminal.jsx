@@ -130,7 +130,7 @@ export function Terminal() {
   return (
     <section id="terminal" className="visible" style={{ opacity: 1, transform: 'none' }}>
       <div className="terminal-wrap">
-        <div className="section-label" style={{ textAlign: 'center', marginBottom: '24px' }}>06 · Interactive Terminal</div>
+        <div className="section-label" style={{ textAlign: 'center', marginBottom: '24px' }}>07 · Interactive Terminal</div>
         <h2 className="section-title" style={{ textAlign: 'center', marginBottom: '40px' }}>Explore via Command Line</h2>
         <div className="terminal-box" onClick={() => inputRef.current?.focus()}>
           <div className="terminal-header">
