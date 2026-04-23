@@ -17,9 +17,6 @@ export function Contact({ onSuccess }) {
           <div className="section-label">07 · Contact</div>
           <h2 className="section-title">Send a Signal</h2>
           <p className="section-body">Open to new missions, collaborations, and interesting problems to automate.</p>
-          <p style={{ fontFamily: "'Space Mono', monospace", fontSize: '11px', color: 'var(--gold)', marginTop: '12px' }}>
-            Quezon City, PH · Open to new missions
-          </p>
           <ContactForm onSuccess={onSuccess} />
         </div>
       </div>

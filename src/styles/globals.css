@@ -67,6 +67,11 @@ body:has(a:hover) #cursor-ring, body:has(button:hover) #cursor-ring { width: 56p
   .term-help { padding: 6px 16px 14px; font-size: 10px; }
   .section-body { font-size: 15px; }
   .exp-bullets li { font-size: 13px; }
+
+  /* contact form — stack name+email, full-width button */
+  .form-row { grid-template-columns: 1fr; gap: 14px; }
+  .btn-send { align-self: stretch; width: 100%; text-align: center; justify-content: center; }
+  .contact-form { gap: 14px; margin-top: 20px; }
 }
 
 /* ── ≤480px  most phones (iPhone 14/15, Pixel, Galaxy S/A) ── */
@@ -76,7 +81,6 @@ body:has(a:hover) #cursor-ring, body:has(button:hover) #cursor-ring { width: 56p
   #terminal { padding: 48px 20px; }
 
   .projects-grid { grid-template-columns: 1fr; }
-  .form-row { grid-template-columns: 1fr; }
 
   .hero-eyebrow { margin-bottom: 18px; font-size: 10px; }
   .hero-name { margin-bottom: 16px; }
