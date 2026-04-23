@@ -14,7 +14,7 @@ export function Contact({ onSuccess }) {
           <PlanetContact />
         </div>
         <div className="content-wrap">
-          <div className="section-label">07 · Contact</div>
+          <div className="section-label">08 · Contact</div>
           <h2 className="section-title">Send a Signal</h2>
           <p className="section-body">Open to new missions, collaborations, and interesting problems to automate.</p>
           <ContactForm onSuccess={onSuccess} />
