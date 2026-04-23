@@ -16,7 +16,6 @@ const COMMANDS = {
     `<span class="term-gold">┌── NORIEL JOY EMBUDO ──────────────────────┐</span>`,
     `  Role    : <span class="term-hi">Automation Software Engineer</span>`,
     `  Location: <span class="term-hi">Quezon City, Philippines</span>`,
-    `  Email   : <span class="term-cyan">embudon@gmail.com</span>`,
     `  Focus   : <span class="term-orange">Agentic AI · RPA · Cloud · Enterprise Automation</span>`,
     `  Impact  : <span class="term-green">100,000+ hours of manual work eliminated annually</span>`,
     `<span class="term-gold">└───────────────────────────────────────────┘</span>`,
