@@ -49,7 +49,17 @@ export function BlogPost({ slug }) {
 
   useEffect(() => {
     window.scrollTo(0, 0);
-  }, [slug]);
+    if (!post) return;
+    const defaultTitle = document.title;
+    const meta = document.querySelector('meta[name="description"]');
+    const defaultDescription = meta?.getAttribute('content') ?? '';
+    document.title = `${post.title} — Noriel Joy Embudo`;
+    meta?.setAttribute('content', post.excerpt);
+    return () => {
+      document.title = defaultTitle;
+      meta?.setAttribute('content', defaultDescription);
+    };
+  }, [slug, post]);
 
   if (!post) {
     return (
