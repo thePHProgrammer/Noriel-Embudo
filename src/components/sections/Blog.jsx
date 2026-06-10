@@ -7,6 +7,7 @@ import { POSTS } from '../../data/posts';
 export function Blog() {
   const sectionRef = useRef(null);
   const visible = useSectionReveal(sectionRef);
+  const posts = [...POSTS].sort((a, b) => b.date.localeCompare(a.date));
 
   return (
     <section id="blog" className={visible ? 'visible' : ''} ref={sectionRef}>
@@ -29,7 +30,7 @@ export function Blog() {
             DEEP-DIVE WRITE-UPS ON DEPLOYED MISSIONS
           </p>
           <div className="blog-list">
-            {POSTS.map(p => (
+            {posts.map(p => (
               <BlogCard key={p.slug} {...p} />
             ))}
           </div>
