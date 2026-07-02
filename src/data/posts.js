@@ -113,76 +113,6 @@ export const POSTS = [
     ],
   },
   {
-    slug: 'content-repurposer',
-    title: 'Content Repurposer: One Blog URL → A Twitter Thread + LinkedIn Post, Automatically',
-    excerpt:
-      'Paste a blog URL and a niche into a form, and an n8n + Claude pipeline turns it into a TL;DR, a ready-to-post Twitter thread, and a LinkedIn post — delivered straight into Notion, with Telegram alerts if anything breaks.',
-    date: '2026-05-19',
-    readTime: '5 min read',
-    tags: ['n8n', 'Claude API', 'Notion', 'Automation'],
-    content: [
-      {
-        type: 'p',
-        text: 'Content Repurposer is a hands-off pipeline that takes one piece of long-form content and turns it into the social posts you actually need to promote it. You give it a blog URL and a niche; it gives you a clean TL;DR, a full Twitter thread, and a polished LinkedIn post — written for your audience and dropped straight into Notion, ready to publish.',
-      },
-      { type: 'h2', text: 'The Problem' },
-      {
-        type: 'p',
-        text: 'Great content dies in a tab. Turning a single article into a Twitter thread and a LinkedIn post is repetitive, time-consuming work that most people skip — so the content never gets the reach it deserves. This pipeline does that repurposing automatically and consistently, every time.',
-      },
-      { type: 'h2', text: 'How It Works' },
-      {
-        type: 'list',
-        items: [
-          '1 — Pick a piece of content worth amplifying (for example, an article like "Agentic AI vs. Generative AI: Key Differences and Use Cases").',
-          '2 — Paste the blog post URL into the Content Repurposer form and set the niche (e.g. "AI").',
-          '3 — Hit submit. The form confirms with "Thanks for Submitting! Check your Notion now!" and the pipeline takes over.',
-          '4 — An n8n workflow fetches, cleans, and rewrites the article with Claude.',
-          '5 — The finished TL;DR, Twitter thread, and LinkedIn post land as a new row in Notion.',
-        ],
-      },
-      { type: 'h2', text: 'The Workflow' },
-      {
-        type: 'p',
-        text: 'The form submission triggers an n8n workflow that runs the article through a clean, observable pipeline:',
-      },
-      {
-        type: 'code',
-        lang: 'text',
-        text: 'Tally Trigger\n  → GET_WebsiteDetails        (fetch the blog post)\n  → REMOVE_HTMLTags           (strip markup to clean text)\n  → POST_ClaudeAPI            (rewrite into TL;DR + thread + post)\n  → NORMALIZE_ClaudeResponse  (parse + validate the model output)\n  → CREATE_DatabaseRow        (write the result into Notion)',
-      },
-      {
-        type: 'p',
-        text: 'Claude does the heavy lifting — reading the cleaned article and rewriting it into a TL;DR, a numbered Twitter thread, and a LinkedIn post tuned to the niche you specified. The normalize step guarantees the output is well-formed before anything is written downstream.',
-      },
-      { type: 'h2', text: 'What You Get' },
-      {
-        type: 'p',
-        text: 'Each run creates a structured Notion entry with everything you need to publish — no copy-pasting, no reformatting:',
-      },
-      {
-        type: 'list',
-        items: [
-          'Title — a clean, rewritten headline.',
-          'Source URL — a link back to the original article.',
-          'TL;DR — a tight summary of the piece.',
-          'Tweet Thread — a numbered, ready-to-post Twitter thread.',
-          'LinkedIn Post — a long-form post written for the chosen niche.',
-          'Date Created — an automatic timestamp.',
-        ],
-      },
-      { type: 'h2', text: 'Reliability & Edge Cases' },
-      {
-        type: 'p',
-        text: 'Automation is only useful if it tells you when it breaks. If fetching the article fails, the workflow branches to a SEND_ErrorMessage step that pings me directly on Telegram with the failure — so a broken run is a notification, not a silent gap you discover days later when a post is missing.',
-      },
-      {
-        type: 'quote',
-        text: 'Write once, repurpose automatically — the reach should be the easy part.',
-      },
-    ],
-  },
-  {
     slug: 'agentic-automation-guardrails',
     title: 'Agentic Automation You Can Trust: Guardrails, Tool Design, and Human-in-the-Loop',
     excerpt:
@@ -246,133 +176,142 @@ export const POSTS = [
     ],
   },
   {
-    slug: 'rpa-to-agentic-automation',
-    title: 'From RPA to Agentic Automation: Lessons from 100,000+ Hours Saved',
+    slug: 'document-extraction-pipeline',
+    title: 'Document/Data Extraction Pipeline: PDFs In, Clean Structured Data Out (n8n + Claude/OpenAI)',
     excerpt:
-      'After shipping 70+ RPA solutions across five countries, I learned exactly where deterministic automation stops paying for itself — and how agentic AI changes the unit of work from "scripted steps" to "goal plus tools".',
-    date: '2026-06-03',
-    readTime: '7 min read',
-    tags: ['Agentic AI', 'RPA', 'UiPath', 'n8n'],
-    content: [
-      {
-        type: 'p',
-        text: 'At DFI Retail Group I built and deployed 70+ automation solutions with UiPath, Power Automate, Python, and C# across Indonesia, Hong Kong, Malaysia, Taiwan, and Vietnam — over 100,000 hours a year handed back to the business. That portfolio taught me two things: deterministic RPA is still wildly underrated, and there is a hard ceiling it will never break through. Agentic AI is what finally moved that ceiling.',
-      },
-      { type: 'h2', text: 'What Classic RPA Gets Right' },
-      {
-        type: 'p',
-        text: 'When a process is stable, rule-based, and high-volume, nothing beats a deterministic bot. It does the same thing every time, it is cheap to run, it is easy to audit, and finance can verify the savings line by line. Most of those 100,000 hours came from exactly this kind of work — invoice processing, report generation, data reconciliation between systems that were never designed to talk to each other.',
-      },
-      { type: 'h2', text: 'Where It Breaks' },
-      {
-        type: 'list',
-        items: [
-          'Brittle selectors — a vendor redesigns one screen and the bot is down until someone re-records the flow.',
-          'Unstructured input — the moment the process involves reading an email, a PDF, or a free-text field, rules explode into unmaintainable branching.',
-          'Exceptions — the bot handles the 80% happy path, and the 20% of exceptions quietly become a human queue that nobody budgeted for.',
-          'Change velocity — every process tweak is a development ticket, so the backlog grows faster than the team.',
-        ],
-      },
-      {
-        type: 'p',
-        text: 'The pattern across all four: deterministic automation encodes the steps, so anything that changes the steps breaks the automation. We were not automating the work — we were automating one snapshot of the work.',
-      },
-      { type: 'h2', text: 'The Shift: From Steps to Goals' },
-      {
-        type: 'p',
-        text: 'Agentic automation changes the unit of work. Instead of scripting "click here, copy this, paste there", you give a model a goal, a set of narrow tools, and guardrails — and it works out the steps at runtime. The email that would have broken a rules engine becomes just another input the model reads. The exception queue becomes the part the agent is best at, because exceptions are exactly the cases that need judgment instead of repetition.',
-      },
-      {
-        type: 'code',
-        lang: 'text',
-        text: 'Classic RPA:   trigger → step 1 → step 2 → ... → step N   (breaks if any step changes)\nAgentic:       trigger → goal + tools + guardrails → agent decides the steps\n                          ↳ validate output → act / escalate to human',
-      },
-      { type: 'h2', text: 'A Decision Framework' },
-      {
-        type: 'p',
-        text: 'Agentic does not replace RPA — it sits above it. This is the framework I use to decide which tool each process deserves:',
-      },
-      {
-        type: 'list',
-        items: [
-          'Stable, rule-based, high-volume → deterministic RPA. An LLM in this loop is cost and latency for nothing.',
-          'Unstructured inputs, judgment calls, natural language → agentic. This is where rules engines go to die.',
-          'High blast radius (payments, compliance, systems of record) → either approach, but always with validation and human approval gates.',
-          'Hybrid is the real answer: an agent doing the reasoning, calling deterministic workflows as its tools. The bot becomes the hands; the model becomes the dispatcher.',
-        ],
-      },
-      { type: 'h2', text: 'What I’d Tell a Team Starting Today' },
-      {
-        type: 'p',
-        text: 'Do not throw away your RPA estate — it is a library of reliable, audited tools your agents can call. Start agentic where deterministic already failed: the exception queues, the inbox triage, the processes that never got automated because they were "too messy". That is the work with no incumbent solution, the cleanest ROI story, and the fastest path to leadership trusting the approach.',
-      },
-      {
-        type: 'quote',
-        text: 'RPA automates a snapshot of the work. Agents automate the work.',
-      },
-    ],
-  },
-  {
-    slug: 'ghl-n8n-ai-pipeline',
-    title: 'GoHighLevel + n8n + Claude: Building an AI Lead-Qualification Pipeline',
-    excerpt:
-      'GHL is excellent at capturing leads and firing follow-up sequences — but deciding which lead is worth chasing takes reasoning. Here is the architecture I use: GHL webhook → n8n → Claude scores the lead and drafts the follow-up → results written back to GHL, where a tag-triggered workflow takes over.',
-    date: '2026-06-10',
+      'Invoices, scanned forms, and reports arrive as PDFs — and someone retypes them into a spreadsheet. This pipeline replaces that job: n8n ingests the document, Claude or GPT extracts and classifies the fields, strict validation catches the lies, and clean rows land in Sheets, Airtable, or your database.',
+    date: '2026-06-24',
     readTime: '8 min read',
-    tags: ['GoHighLevel', 'n8n', 'Claude API', 'CRM Automation'],
+    tags: ['n8n', 'Claude API', 'OpenAI', 'Document AI', 'Airtable'],
     content: [
       {
         type: 'p',
-        text: 'GoHighLevel is the operating system of a huge number of agencies and local businesses: funnels, calendars, pipelines, SMS, and email in one place. Its workflow builder is genuinely good at linear sequences — when X happens, wait, send Y. What it cannot do natively is reason: read a messy form submission, judge intent, score fit, and write a follow-up that sounds like it was written for that specific person. This post is the architecture I use to bolt that reasoning layer onto GHL with n8n and Claude — without fighting the platform.',
+        text: 'Every business has a version of this job: documents arrive — invoices, purchase orders, intake forms, scanned applications — and a human reads each one and retypes the important fields into a spreadsheet or a system. It is slow, error-prone, and nobody wants to do it. This post is the pipeline I build to replace it: PDF in, AI extracts structured fields, validation proves the extraction is trustworthy, and clean rows land in Google Sheets, Airtable, or a database. The same architecture I run for enterprise ticket and report pipelines, pointed at documents.',
       },
+      // TODO: add workflow screenshot here once uploaded, e.g.
+      // { type: 'img', src: '/uploads/doc-extraction-workflow.png', alt: 'n8n document extraction workflow', caption: 'The full n8n pipeline: ingest → extract → validate → write' },
       { type: 'h2', text: 'The Problem' },
       {
         type: 'p',
-        text: 'Every lead that hits a GHL funnel gets the same treatment: the same drip sequence, the same generic first message, the same priority in the pipeline. But leads are not equal. One form submission says "need a quote for 40 units by Friday" and another says "just looking" — and a keyword rule cannot reliably tell the difference, because real humans write real sentences. The result is sales teams wading through unqualified leads while the urgent ones wait in the same queue.',
+        text: 'Classic OCR gives you text, not answers. It will happily read an invoice into a wall of characters, but it cannot tell you which number is the total, which line is the vendor, or that page 3 is actually a different document. Template-based extractors solve one layout and break on the next vendor’s format. What businesses actually need is layout-independent extraction: hand the system any reasonable document and get back the same named fields, every time.',
       },
-      { type: 'h2', text: 'The Architecture' },
-      {
-        type: 'p',
-        text: 'The principle: let GHL do what GHL is great at — capture, sequences, and sending — and route the thinking through n8n. GHL fires a webhook on every new lead; n8n enriches it, asks Claude for a structured verdict, writes that verdict back onto the contact; and a tag applied by the API triggers the right GHL workflow. GHL stays the system of record and the delivery engine. n8n and Claude are just the brain in the middle.',
-      },
+      { type: 'h2', text: 'The Pipeline' },
       {
         type: 'code',
         lang: 'text',
-        text: 'GHL Webhook (new lead / form submission)\n  → NORMALIZE_LeadPayload      (validate + reshape the inbound JSON)\n  → GET_ContactContext         (pull history & custom fields via GHL API)\n  → POST_ClaudeAPI             (score fit, urgency, intent + draft follow-up)\n  → VALIDATE_ClaudeResponse    (strict JSON schema check on the verdict)\n  → PUT_GHLContact             (write score & summary to custom fields)\n  → POST_GHLTag                (apply hot-lead / nurture / disqualify tag)\n       ↳ tag triggers the matching GHL workflow (SMS / email / pipeline move)\n  → on any failure: SEND_ErrorMessage → Telegram alert with trace code',
+        text: 'Trigger (email attachment / Drive folder / upload form)\n  → NORMALIZE_Document        (PDF → images or text; split multi-doc files)\n  → CLASSIFY_DocumentType     (invoice? PO? intake form? unknown → human)\n  → EXTRACT_Fields            (Claude/GPT vision → strict JSON schema)\n  → VALIDATE_Extraction       (schema + business rules + math checks)\n  → WRITE_Destination         (Sheets / Airtable / Postgres upsert)\n  → on any failure: SEND_ErrorMessage → Telegram alert with trace code',
       },
-      { type: 'h2', text: 'The Claude Step' },
       {
         type: 'p',
-        text: 'The prompt gives Claude the lead’s form answers, source, and any prior conversation history, and demands a single JSON object back: a fit score, an urgency score, a one-line reasoning summary, a routing decision, and a drafted first follow-up written in the business’s voice. Demanding structured output is what makes the model a component instead of a chatbot — the verdict either matches the schema or the run fails loudly.',
+        text: 'Two design choices carry the whole thing. First, classification runs before extraction — knowing the document type lets you use a targeted prompt and schema per type instead of one bloated mega-prompt, and anything the classifier cannot place routes straight to a human instead of being force-fit. Second, the model is never asked to “read the document” — it is asked to fill a specific JSON schema, field by field, with an explicit instruction to return null for anything it cannot find rather than guessing.',
+      },
+      { type: 'h2', text: 'The Extraction Step' },
+      {
+        type: 'p',
+        text: 'Claude and GPT-4o both read documents as images, which means scanned forms, photographed receipts, and digital PDFs all go through the same door — no separate OCR stage to maintain. The prompt pins down the schema, the units, the date format, and the null policy. A typical invoice extraction returns:',
       },
       {
         type: 'code',
         lang: 'json',
-        text: '{\n  "status": "success",\n  "data": {\n    "fitScore": 87,\n    "urgency": "high",\n    "route": "hot-lead",\n    "reasoning": "Asked for 40-unit quote with a Friday deadline; budget owner.",\n    "draftFollowUp": "Hi Maria — saw you need 40 units by Friday. We can do that. Quick call at 2pm today to lock pricing?"\n  },\n  "meta": { "trace": "GHL-200-OK" }\n}',
+        text: '{\n  "status": "success",\n  "data": {\n    "documentType": "invoice",\n    "vendorName": "Apex Industrial Supply",\n    "invoiceNumber": "INV-20418",\n    "invoiceDate": "2026-06-12",\n    "currency": "PHP",\n    "lineItems": [\n      { "description": "Ball valve 2in", "qty": 12, "unitPrice": 850.0, "amount": 10200.0 }\n    ],\n    "subtotal": 10200.0,\n    "tax": 1224.0,\n    "total": 11424.0,\n    "confidence": 0.96\n  },\n  "meta": { "trace": "DOC-200-OK" }\n}',
       },
-      { type: 'h2', text: 'Writing Back to GHL' },
+      { type: 'h2', text: 'Validation: Where Trust Is Earned' },
+      {
+        type: 'p',
+        text: 'Model output is user input — the same rule I apply to every agentic system. Extraction only counts after it survives three layers of checks:',
+      },
       {
         type: 'list',
         items: [
-          'Custom fields — AI Fit Score, AI Summary, and the drafted follow-up land on the contact, so reps see the verdict right inside GHL.',
-          'Tags as the trigger surface — applying hot-lead, nurture, or disqualify is what fires the matching GHL workflow. Tags are the cleanest API-to-workflow bridge the platform has.',
-          'Hot leads get the drafted message and an immediate pipeline move plus a rep notification; nurture leads drop into the long-game sequence; disqualified leads exit politely.',
-          'The draft is a starting point, not an auto-send — for higher-stakes messages, keep a human approving before delivery.',
+          'Schema validation — every field present, correctly typed, dates parseable, enums in range. Malformed output fails the run; it never gets “cleaned up” downstream.',
+          'Business rules — line items must sum to the subtotal, subtotal + tax must equal the total, dates cannot be in the future, currency must match the vendor’s known currency. Math the model cannot fake.',
+          'Confidence routing — high-confidence extractions flow straight through to the destination; low-confidence ones land in a review queue with the original document attached, so a human confirms in seconds instead of retyping in minutes.',
         ],
       },
-      { type: 'h2', text: 'When Native GHL AI Is Enough' },
       {
         type: 'p',
-        text: 'GHL ships its own AI features — Conversation AI for chat-style replies and Workflow AI steps for lightweight decisions — and for many accounts they are genuinely enough. If you need a bot that answers FAQs and books appointments, use the native features and skip the engineering. Reach for the n8n + Claude layer when you need things the native tools cannot give you: full control of the prompt and model, structured multi-field verdicts, enrichment from systems outside GHL, your own logging and alerting, and logic you can version, test, and reuse across every sub-account instead of rebuilding it funnel by funnel.',
+        text: 'That last layer is what makes the system honest about its limits. The goal is not 100% automation — it is 100% of documents handled correctly, with the model doing the bulk and humans only touching the genuinely ambiguous ones.',
+      },
+      { type: 'h2', text: 'Writing to the Destination' },
+      {
+        type: 'p',
+        text: 'The final step is an idempotent upsert keyed on a natural identifier — vendor + invoice number, or a form submission ID — so re-running a failed batch never creates duplicates. Sheets and Airtable get the flat fields for the operations team; Postgres gets the full structured record including line items. Every row carries the trace code, so any value in the spreadsheet can be walked back to the exact run and the exact source document that produced it.',
+      },
+      { type: 'h2', text: 'Lessons from Enterprise Pipelines' },
+      {
+        type: 'p',
+        text: 'This is the same discipline as the Zendesk and report pipelines I run in my enterprise work, transplanted onto documents: strict JSON contracts on every hop, standardized trace codes on every run, and failures that page me on Telegram instead of dying silently. A document pipeline that silently drops one invoice a week is worse than no pipeline — the failure mode must always be a loud notification, never a missing row someone finds at month-end close.',
+      },
+      {
+        type: 'quote',
+        text: 'OCR reads documents. This pipeline answers them — and proves the answer before anyone acts on it.',
+      },
+    ],
+  },
+  {
+    slug: 'lead-capture-ghl-followup',
+    title: 'Lead Capture → CRM → Follow-up: The n8n + GoHighLevel Pipeline Every Client Asks For',
+    excerpt:
+      'Form or webhook in → dedupe check → create/update the GoHighLevel contact → auto-tag by source → the right SMS/email sequence fires within seconds. The most-requested automation in the GHL world, built the production way: validated payloads, no duplicate contacts, no lead ever silently dropped.',
+    date: '2026-07-01',
+    readTime: '8 min read',
+    tags: ['GoHighLevel', 'n8n', 'CRM Automation', 'Lead Capture'],
+    content: [
+      {
+        type: 'p',
+        text: 'If you build automations for agencies and local businesses, one request comes up more than everything else combined: “when a lead comes in, get it into GoHighLevel, tag it, and start the follow-up — automatically.” Speed-to-lead is the whole game; a lead contacted within five minutes is dramatically more likely to convert than one contacted an hour later. This post is the pipeline I build for that job, shaped by my GHL assessment work: webhook in, dedupe, create or update the contact, tag by source, and let the tag fire the right sequence.',
+      },
+      // TODO: add workflow screenshot here once uploaded, e.g.
+      // { type: 'img', src: '/uploads/lead-capture-workflow.png', alt: 'n8n lead capture to GHL workflow', caption: 'Webhook → dedupe → GHL upsert → tag → sequence' },
+      { type: 'h2', text: 'The Problem' },
+      {
+        type: 'p',
+        text: 'Leads arrive from everywhere — Facebook lead ads, website forms, landing pages, chat widgets, purchased lists — and each source formats its payload differently. Wire them all straight into the CRM and you get the classic mess: duplicate contacts for the same person, no record of which channel produced which lead, and follow-up that depends on whether a human happened to check the inbox. Meanwhile the lead who filled out the form at 9pm is buying from whoever texted back first.',
+      },
+      { type: 'h2', text: 'The Pipeline' },
+      {
+        type: 'code',
+        lang: 'text',
+        text: 'Webhook / Form Trigger (FB lead ad, website form, landing page)\n  → NORMALIZE_LeadPayload     (validate + reshape each source into one schema)\n  → SEARCH_GHLContact         (dedupe by email, then phone)\n  → IF found  → PUT_GHLContact   (update fields, preserve history)\n    IF new    → POST_GHLContact  (create with full source attribution)\n  → POST_GHLTag               (auto-tag by source + campaign)\n       ↳ tag triggers the matching GHL workflow (SMS / email sequence,\n         pipeline stage, rep notification)\n  → on any failure: SEND_ErrorMessage → Telegram alert with trace code',
+      },
+      { type: 'h2', text: 'Normalization: One Schema for Every Source' },
+      {
+        type: 'p',
+        text: 'The first node earns its keep for the life of the system. Every source payload — whatever Facebook, the form builder, or the chat widget decides to send — is validated and reshaped into a single lead schema: name, email, phone in E.164 format, source, campaign, and the raw answers. Downstream nodes only ever see that one shape, so adding a new lead source is a new mapping in one node, not a new copy of the whole workflow.',
+      },
+      { type: 'h2', text: 'Dedupe: The Step Everyone Skips' },
+      {
+        type: 'list',
+        items: [
+          'Search GHL by email first, then by normalized phone — leads often resubmit with the same phone and a new email, or vice versa.',
+          'Existing contact → update, never recreate. New fields merge in, the original attribution stays, and a returning-lead tag can mark the re-engagement — which is a buying signal, not noise.',
+          'New contact → create with full source attribution stamped into custom fields from day one.',
+          'Why it matters: duplicates split the conversation history across records, fire the same sequence at one person twice, and make every report lie. Fixing duplicates later is archaeology; preventing them is one node.',
+        ],
+      },
+      { type: 'h2', text: 'Tags as the Routing Layer' },
+      {
+        type: 'p',
+        text: 'In GoHighLevel, tags are the cleanest bridge between the API and the workflow builder — so the pipeline’s final act is applying tags, and the tags do the routing. A src:fb-leadform tag fires the Facebook follow-up sequence; src:website fires the website one; campaign tags let each promotion get its own first message. The follow-up itself — the SMS that goes out in seconds, the email drip, the pipeline stage move, the rep notification — lives natively in GHL workflows, where the client’s team can see it, edit the copy, and own it without ever touching n8n.',
+      },
+      {
+        type: 'code',
+        lang: 'json',
+        text: '{\n  "status": "success",\n  "description": "Lead upserted and routed",\n  "data": {\n    "contactId": "ghl_8f2k1",\n    "action": "created",\n    "source": "fb-leadform",\n    "tags": ["src:fb-leadform", "campaign:june-promo"],\n    "sequenceTriggered": "fb-fast-followup"\n  },\n  "meta": { "trace": "LEAD-201-OK" }\n}',
+      },
+      { type: 'h2', text: 'Where Qualification Slots In' },
+      {
+        type: 'p',
+        text: 'This pipeline is deliberately deterministic — capture and routing should be boring and instant. When a client wants qualification too, an AI scoring step slots in cleanly between normalization and tagging: the model reads the lead’s answers, scores fit and urgency, and the tag it produces (hot-lead, nurture, disqualify) routes to a different sequence. Same pipeline, one extra node — the capture layer doesn’t change, which is exactly why it’s worth building right the first time.',
       },
       { type: 'h2', text: 'Reliability Notes' },
       {
         type: 'p',
-        text: 'The same production rules from my enterprise n8n work apply unchanged here: every payload validated on the way in and out, every run stamped with a trace code, every failure branching to a Telegram alert instead of dying silently. A lead-qualification pipeline that silently drops leads is worse than no pipeline at all — the failure mode must be a notification, never a missing follow-up nobody noticed.',
+        text: 'A lead pipeline has one unforgivable failure mode: silently dropping a lead someone paid ad money to generate. So the production rules apply in full — every payload validated at the boundary, every run stamped with a trace code, retries on GHL API hiccups, and any terminal failure branching to a Telegram alert with the full payload attached, so the lead can be recovered by hand while the bug gets fixed. The pipeline is allowed to fail; it is never allowed to fail quietly.',
       },
       {
         type: 'quote',
-        text: 'Let GHL run the sequences. Let the model make the judgment calls. Never confuse the two.',
+        text: 'Speed-to-lead wins deals. The pipeline’s job is making sure the follow-up starts before the lead’s coffee gets cold.',
       },
     ],
   },
