@@ -259,10 +259,14 @@ export const POSTS = [
     content: [
       {
         type: 'p',
-        text: 'If you build automations for agencies and local businesses, one request comes up more than everything else combined: “when a lead comes in, get it into GoHighLevel, tag it, and start the follow-up — automatically.” Speed-to-lead is the whole game; a lead contacted within five minutes is dramatically more likely to convert than one contacted an hour later. This post is the pipeline I build for that job, shaped by my GHL assessment work: webhook in, dedupe, create or update the contact, tag by source, and let the tag fire the right sequence.',
+        text: 'If you build automations for agencies and local businesses, one request comes up more than everything else combined: “when a lead comes in, get it into GoHighLevel, tag it, and start the follow-up — automatically.” Speed-to-lead is the whole game; a lead contacted within five minutes is dramatically more likely to convert than one contacted an hour later. This post walks through the pipeline I built for that job: webhook in, validate, upsert the contact, tag by source, drop it into the sales pipeline — and if anything fails, the team knows within seconds.',
       },
-      // TODO: add workflow screenshot here once uploaded, e.g.
-      // { type: 'img', src: '/uploads/lead-capture-workflow.png', alt: 'n8n lead capture to GHL workflow', caption: 'Webhook → dedupe → GHL upsert → tag → sequence' },
+      {
+        type: 'img',
+        src: '/uploads/lead-capture-workflow.png',
+        alt: 'n8n lead capture to GoHighLevel workflow with intake, CRM sync, confirm/log, and error handling groups',
+        caption: 'The full n8n build: Lead Intake → Validate → CRM Sync (GHL) → Confirm + Log, with a dedicated error-handling lane.',
+      },
       { type: 'h2', text: 'The Problem' },
       {
         type: 'p',
@@ -270,29 +274,32 @@ export const POSTS = [
       },
       { type: 'h2', text: 'The Pipeline' },
       {
+        type: 'p',
+        text: 'The workflow is organized into four labeled lanes on the n8n canvas — Lead Intake, CRM Sync, Confirm + Log, and Error Handling — so anyone opening it can read the business logic straight off the canvas:',
+      },
+      {
         type: 'code',
         lang: 'text',
-        text: 'Webhook / Form Trigger (FB lead ad, website form, landing page)\n  → NORMALIZE_LeadPayload     (validate + reshape each source into one schema)\n  → SEARCH_GHLContact         (dedupe by email, then phone)\n  → IF found  → PUT_GHLContact   (update fields, preserve history)\n    IF new    → POST_GHLContact  (create with full source attribution)\n  → POST_GHLTag               (auto-tag by source + campaign)\n       ↳ tag triggers the matching GHL workflow (SMS / email sequence,\n         pipeline stage, rep notification)\n  → on any failure: SEND_ErrorMessage → Telegram alert with trace code',
+        text: '01 – Lead Intake (Facebook)      webhook receives the lead\n02 – Normalize Contact Data      clean phone/email format, one schema\n03 – Validate: Has Email or Phone?\n  ├─ true  → 04 – Upsert Contact (GHL)\n  │           → 05 – Apply Source Tag (GHL)\n  │           → 06 – Create Opportunity (GHL)\n  │           → 07 – Respond to Caller\n  │           → 08 – Log Success            (append: sheet)\n  └─ false → 09 – Log Rejected Lead         (append: sheet)\n\nany node error → 09a – Alert: Pipeline Failure  (Slack message)',
       },
-      { type: 'h2', text: 'Normalization: One Schema for Every Source' },
+      { type: 'h2', text: 'Lead Intake: One Schema Before Anything Else' },
       {
         type: 'p',
-        text: 'The first node earns its keep for the life of the system. Every source payload — whatever Facebook, the form builder, or the chat widget decides to send — is validated and reshaped into a single lead schema: name, email, phone in E.164 format, source, campaign, and the raw answers. Downstream nodes only ever see that one shape, so adding a new lead source is a new mapping in one node, not a new copy of the whole workflow.',
+        text: 'The intake lane receives the lead from Facebook, cleans up the phone and email format, and checks that there is enough information to create a contact at all. Every source payload — whatever Facebook or the form builder decides to send — is reshaped into a single lead schema before any CRM call happens: name, email, phone in a consistent format, source. Downstream nodes only ever see that one shape, so adding a new lead source is a new mapping in one node, not a new copy of the whole workflow. And the validation gate (03) means a lead with no email and no phone never wastes an API call — it routes straight to the rejected-lead log instead.',
       },
-      { type: 'h2', text: 'Dedupe: The Step Everyone Skips' },
+      { type: 'h2', text: 'CRM Sync: Upsert, Tag, Opportunity' },
       {
         type: 'list',
         items: [
-          'Search GHL by email first, then by normalized phone — leads often resubmit with the same phone and a new email, or vice versa.',
-          'Existing contact → update, never recreate. New fields merge in, the original attribution stays, and a returning-lead tag can mark the re-engagement — which is a buying signal, not noise.',
-          'New contact → create with full source attribution stamped into custom fields from day one.',
-          'Why it matters: duplicates split the conversation history across records, fire the same sequence at one person twice, and make every report lie. Fixing duplicates later is archaeology; preventing them is one node.',
+          '04 – Upsert Contact — GHL’s upsert endpoint creates the contact or updates the existing one, so the same person submitting twice never becomes two records. Duplicates split conversation history, fire the same sequence twice, and make every report lie; the upsert kills that class of bug at the API level.',
+          '05 – Apply Source Tag — the contact is tagged by source (facebook, website, …). In GoHighLevel, tags are the cleanest bridge between the API and the workflow builder: the tag is what fires the matching GHL follow-up sequence — SMS, email drip, rep notification — which the client’s team owns natively inside GHL without ever touching n8n.',
+          '06 – Create Opportunity — the lead lands in the sales pipeline immediately, so it exists where the sales team actually looks, not just in the contact list.',
         ],
       },
-      { type: 'h2', text: 'Tags as the Routing Layer' },
+      { type: 'h2', text: 'Confirm + Log: Close the Loop' },
       {
         type: 'p',
-        text: 'In GoHighLevel, tags are the cleanest bridge between the API and the workflow builder — so the pipeline’s final act is applying tags, and the tags do the routing. A src:fb-leadform tag fires the Facebook follow-up sequence; src:website fires the website one; campaign tags let each promotion get its own first message. The follow-up itself — the SMS that goes out in seconds, the email drip, the pipeline stage move, the rep notification — lives natively in GHL workflows, where the client’s team can see it, edit the copy, and own it without ever touching n8n.',
+        text: 'Once the CRM sync succeeds, 07 – Respond to Caller sends a confirmation back to the webhook caller, and 08 – Log Success appends the lead to a Google Sheet. That sheet is the running audit trail — every lead that entered the system, when, and from where — which makes “did lead X ever come through?” a ten-second lookup instead of an n8n archaeology session.',
       },
       {
         type: 'code',
@@ -304,10 +311,20 @@ export const POSTS = [
         type: 'p',
         text: 'This pipeline is deliberately deterministic — capture and routing should be boring and instant. When a client wants qualification too, an AI scoring step slots in cleanly between normalization and tagging: the model reads the lead’s answers, scores fit and urgency, and the tag it produces (hot-lead, nurture, disqualify) routes to a different sequence. Same pipeline, one extra node — the capture layer doesn’t change, which is exactly why it’s worth building right the first time.',
       },
-      { type: 'h2', text: 'Reliability Notes' },
+      { type: 'h2', text: 'Error Handling: Nothing Falls Through the Cracks' },
       {
         type: 'p',
-        text: 'A lead pipeline has one unforgivable failure mode: silently dropping a lead someone paid ad money to generate. So the production rules apply in full — every payload validated at the boundary, every run stamped with a trace code, retries on GHL API hiccups, and any terminal failure branching to a Telegram alert with the full payload attached, so the lead can be recovered by hand while the bug gets fixed. The pipeline is allowed to fail; it is never allowed to fail quietly.',
+        text: 'A lead pipeline has one unforgivable failure mode: silently dropping a lead someone paid ad money to generate. So every GHL node’s error output — and the validation gate’s false branch — routes into a dedicated error-handling lane. Rejected leads are appended to their own sheet (09 – Log Rejected Lead), and any pipeline failure fires 09a – Alert: Pipeline Failure, a Slack message with everything needed to recover the lead by hand:',
+      },
+      {
+        type: 'img',
+        src: '/uploads/lead-capture-slack-alert.png',
+        alt: 'Slack alert showing a lead pipeline failure with client, source, timestamp, API error, and the lead contact details',
+        caption: 'The real alert: client, source, timestamp, the exact API error (a 401 from GHL), the lead’s contact info, and recovery instructions.',
+      },
+      {
+        type: 'p',
+        text: 'The alert carries the client name, the source, the timestamp, the raw API error, and — critically — the lead’s email and phone, plus explicit instructions: this lead did NOT reach GHL, check the error log, re-run from n8n Executions. When this screenshot was taken, the alert caught a 401 auth error against the GHL API — exactly the kind of failure that would otherwise eat leads invisibly until someone noticed the pipeline had gone quiet. Instead it was a Slack ping with the lead’s details attached, recoverable in under a minute. The pipeline is allowed to fail; it is never allowed to fail quietly.',
       },
       {
         type: 'quote',
