@@ -182,14 +182,18 @@ export const POSTS = [
       'Invoices, scanned forms, and reports arrive as PDFs — and someone retypes them into a spreadsheet. This pipeline replaces that job: n8n ingests the document, Claude or GPT extracts and classifies the fields, strict validation catches the lies, and clean rows land in Sheets, Airtable, or your database.',
     date: '2026-06-24',
     readTime: '8 min read',
-    tags: ['n8n', 'Claude API', 'OpenAI', 'Document AI', 'Airtable'],
+    tags: ['n8n', 'Claude API', 'Document AI', 'Google Sheets', 'Slack'],
     content: [
       {
         type: 'p',
-        text: 'Every business has a version of this job: documents arrive — invoices, purchase orders, intake forms, scanned applications — and a human reads each one and retypes the important fields into a spreadsheet or a system. It is slow, error-prone, and nobody wants to do it. This post is the pipeline I build to replace it: PDF in, AI extracts structured fields, validation proves the extraction is trustworthy, and clean rows land in Google Sheets, Airtable, or a database. The same architecture I run for enterprise ticket and report pipelines, pointed at documents.',
+        text: 'Every business has a version of this job: documents arrive — invoices, purchase orders, intake forms, scanned applications — and a human reads each one and retypes the important fields into a spreadsheet or a system. It is slow, error-prone, and nobody wants to do it. This post walks through the pipeline I built to replace it: drop a document into a folder, Claude extracts the structured fields, validation proves the extraction is trustworthy, and clean rows land in Google Sheets — with anything questionable routed to a review queue instead of silently corrupting the records.',
       },
-      // TODO: add workflow screenshot here once uploaded, e.g.
-      // { type: 'img', src: '/uploads/doc-extraction-workflow.png', alt: 'n8n document extraction workflow', caption: 'The full n8n pipeline: ingest → extract → validate → write' },
+      {
+        type: 'img',
+        src: '/uploads/Document_Extraction_Pipeline.png',
+        alt: 'n8n document extraction workflow with ingest, extract & validate, and route lanes',
+        caption: 'The full n8n build: Ingest (Drive folder) → Extract & Validate (Claude) → Route valid vs invalid.',
+      },
       { type: 'h2', text: 'The Problem' },
       {
         type: 'p',
@@ -197,50 +201,96 @@ export const POSTS = [
       },
       { type: 'h2', text: 'The Pipeline' },
       {
+        type: 'p',
+        text: 'The workflow is organized into three labeled lanes on the n8n canvas — Ingest, Extract & Validate, and Route — so the business logic reads straight off the canvas:',
+      },
+      {
         type: 'code',
         lang: 'text',
-        text: 'Trigger (email attachment / Drive folder / upload form)\n  → NORMALIZE_Document        (PDF → images or text; split multi-doc files)\n  → CLASSIFY_DocumentType     (invoice? PO? intake form? unknown → human)\n  → EXTRACT_Fields            (Claude/GPT vision → strict JSON schema)\n  → VALIDATE_Extraction       (schema + business rules + math checks)\n  → WRITE_Destination         (Sheets / Airtable / Postgres upsert)\n  → on any failure: SEND_ErrorMessage → Telegram alert with trace code',
+        text: '01 – Watch Intake Folder       (Google Drive trigger: fileCreated)\n02 – Download Source File\n03 – Encode Image to Base64\n04 – Extract Fields via Claude (POST api.anthropic.com)\n05 – Parse Claude JSON\n06 – Validate Extraction       (schema + math checks)\n07 – Route Valid vs Invalid\n  ├─ valid   → 08a – Format Invoice Summary Row → 09a – Append to Invoices Tab\n  │            08b – Split Line Items Array → 09b – Format Line Item Row\n  │                → 10b – Append to Line Items Tab\n  └─ invalid → 08c – Format Error Row → 09c – Append to Errors Tab\n                   → 10c – Notify Reviewer (Slack)',
       },
       {
         type: 'p',
-        text: 'Two design choices carry the whole thing. First, classification runs before extraction — knowing the document type lets you use a targeted prompt and schema per type instead of one bloated mega-prompt, and anything the classifier cannot place routes straight to a human instead of being force-fit. Second, the model is never asked to “read the document” — it is asked to fill a specific JSON schema, field by field, with an explicit instruction to return null for anything it cannot find rather than guessing.',
+        text: 'Two design choices carry the whole thing. First, the intake is a watched Drive folder — anyone on the team can feed the pipeline by dropping a file in, no form, no training, no new tool to learn. Second, the model is never asked to “read the document” — it is asked to fill a specific JSON schema, field by field, with an explicit instruction to return null for anything it cannot find rather than guessing.',
       },
       { type: 'h2', text: 'The Extraction Step' },
       {
         type: 'p',
-        text: 'Claude and GPT-4o both read documents as images, which means scanned forms, photographed receipts, and digital PDFs all go through the same door — no separate OCR stage to maintain. The prompt pins down the schema, the units, the date format, and the null policy. A typical invoice extraction returns:',
+        text: 'Claude reads documents as images, which means scanned forms, photographed receipts, and digital PDFs all go through the same door — no separate OCR stage to maintain. The prompt pins down the schema, the units, the date format, and the null policy. Here is one of the test documents — a commercial invoice with five line items:',
+      },
+      {
+        type: 'img',
+        src: '/uploads/Sample_Receipt.png',
+        alt: 'Sample commercial invoice from Cybernetic Logistics Solutions with five line items',
+        caption: 'A test input: photographed commercial invoice, five line items, tax and shipping.',
+      },
+      {
+        type: 'p',
+        text: 'Claude returns it as one strict JSON object — vendor, invoice number, date, the amounts, and every line item as structured data:',
       },
       {
         type: 'code',
         lang: 'json',
-        text: '{\n  "status": "success",\n  "data": {\n    "documentType": "invoice",\n    "vendorName": "Apex Industrial Supply",\n    "invoiceNumber": "INV-20418",\n    "invoiceDate": "2026-06-12",\n    "currency": "PHP",\n    "lineItems": [\n      { "description": "Ball valve 2in", "qty": 12, "unitPrice": 850.0, "amount": 10200.0 }\n    ],\n    "subtotal": 10200.0,\n    "tax": 1224.0,\n    "total": 11424.0,\n    "confidence": 0.96\n  },\n  "meta": { "trace": "DOC-200-OK" }\n}',
+        text: '{\n  "vendor": "Cybernetic Logistics Solutions",\n  "invoice_number": "F1000876/23",\n  "invoice_date": "14/08/2023",\n  "subtotal": 740.0,\n  "shipping": 100.0,\n  "insurance": 0.0,\n  "tax": 86.06,\n  "total": 926.06,\n  "line_items": [\n    { "description": "Control Panel Assembly", "hs_code": "88565.2252", "units": 2, "unit_price": 200.0, "line_total": 400.0 },\n    { "description": "Power Cable Loom", "hs_code": "88565.2545", "units": 1, "unit_price": 85.0, "line_total": 85.0 }\n  ]\n}',
       },
       { type: 'h2', text: 'Validation: Where Trust Is Earned' },
       {
         type: 'p',
-        text: 'Model output is user input — the same rule I apply to every agentic system. Extraction only counts after it survives three layers of checks:',
+        text: 'Model output is user input — the same rule I apply to every agentic system. Extraction only counts after it survives the checks in node 06, and we verify the math ourselves rather than trust the model blindly:',
       },
       {
         type: 'list',
         items: [
-          'Schema validation — every field present, correctly typed, dates parseable, enums in range. Malformed output fails the run; it never gets “cleaned up” downstream.',
-          'Business rules — line items must sum to the subtotal, subtotal + tax must equal the total, dates cannot be in the future, currency must match the vendor’s known currency. Math the model cannot fake.',
-          'Confidence routing — high-confidence extractions flow straight through to the destination; low-confidence ones land in a review queue with the original document attached, so a human confirms in seconds instead of retyping in minutes.',
+          'Schema validation — every field present, correctly typed, dates parseable. Malformed output fails the run; it never gets “cleaned up” downstream.',
+          'Math checks — line items must sum to the subtotal, and subtotal + shipping + insurance + tax must equal the total. Math the model cannot fake.',
+          'Routing — valid extractions flow to the live sheet; anything questionable goes to a review queue instead of silently corrupting the records.',
         ],
       },
       {
         type: 'p',
-        text: 'That last layer is what makes the system honest about its limits. The goal is not 100% automation — it is 100% of documents handled correctly, with the model doing the bulk and humans only touching the genuinely ambiguous ones.',
+        text: 'This is not theoretical. During testing, the validator caught Claude extracting a subtotal of 485 from an invoice whose line items summed to 740 — and instead of a wrong number landing in the books, the reviewer got a Slack alert with the vendor, the file, and the exact discrepancy:',
+      },
+      {
+        type: 'img',
+        src: '/uploads/Document_Extraction_Error.png',
+        alt: 'Slack alert saying invoice extraction needs review, with vendor, invoice number, file, and the math discrepancy',
+        caption: 'The validator at work: “line items sum to 740, but invoice subtotal is 485” — caught before it touched the live sheet.',
+      },
+      {
+        type: 'p',
+        text: 'The rejected extraction lands in a dedicated Errors tab with the raw extracted JSON, the failure reason, and a Reviewed column — a review queue where a human confirms in seconds instead of retyping in minutes. The goal is not 100% automation; it is 100% of documents handled correctly, with the model doing the bulk and humans only touching the genuinely ambiguous ones.',
+      },
+      {
+        type: 'img',
+        src: '/uploads/Document_Extraction_Error(1).png',
+        alt: 'Errors tab in Google Sheets with timestamp, file name, vendor, raw extracted JSON, error text, and a Reviewed column',
+        caption: 'The Errors tab: raw JSON preserved for the reviewer, failure reason spelled out, Reviewed column to track the queue.',
       },
       { type: 'h2', text: 'Writing to the Destination' },
       {
         type: 'p',
-        text: 'The final step is an idempotent upsert keyed on a natural identifier — vendor + invoice number, or a form submission ID — so re-running a failed batch never creates duplicates. Sheets and Airtable get the flat fields for the operations team; Postgres gets the full structured record including line items. Every row carries the trace code, so any value in the spreadsheet can be walked back to the exact run and the exact source document that produced it.',
+        text: 'Valid extractions are written to Google Sheets in a properly normalized shape — not one blob row. The Invoices tab gets a summary row per document (vendor, invoice number, date, subtotal, shipping, tax, total, line-item count), and a separate Line Items tab gets one row per item, keyed by invoice number, so the data is immediately usable for lookups and pivots:',
+      },
+      {
+        type: 'img',
+        src: '/uploads/Document_Extraction_Invoices_File.png',
+        alt: 'Invoices tab in Google Sheets with one summary row per extracted invoice',
+        caption: 'Invoices tab: one summary row per document — totals, dates, and line-item count at a glance.',
+      },
+      {
+        type: 'img',
+        src: '/uploads/Document_Extraction_Line_Items.png',
+        alt: 'Line Items tab in Google Sheets with one row per invoice line item, keyed by invoice number',
+        caption: 'Line Items tab: every item as its own row, keyed by invoice number — ready for pivots and reconciliation.',
+      },
+      {
+        type: 'p',
+        text: 'Sheets is the destination here because that is where this team lives, but the write step is just the last node — the same pipeline lands rows in Airtable or Postgres by swapping one node, with the extraction and validation layers untouched.',
       },
       { type: 'h2', text: 'Lessons from Enterprise Pipelines' },
       {
         type: 'p',
-        text: 'This is the same discipline as the Zendesk and report pipelines I run in my enterprise work, transplanted onto documents: strict JSON contracts on every hop, standardized trace codes on every run, and failures that page me on Telegram instead of dying silently. A document pipeline that silently drops one invoice a week is worse than no pipeline — the failure mode must always be a loud notification, never a missing row someone finds at month-end close.',
+        text: 'This is the same discipline as the Zendesk and report pipelines I run in my enterprise work, transplanted onto documents: strict JSON contracts on every hop, validation before anything touches a system of record, and failures that ping a reviewer on Slack instead of dying silently. A document pipeline that silently drops one invoice a week is worse than no pipeline — the failure mode must always be a loud notification, never a missing row someone finds at month-end close.',
       },
       {
         type: 'quote',
@@ -263,7 +313,7 @@ export const POSTS = [
       },
       {
         type: 'img',
-        src: '/uploads/lead-capture-workflow.png',
+        src: '/uploads/Lead_Capture_Pipeline.png',
         alt: 'n8n lead capture to GoHighLevel workflow with intake, CRM sync, confirm/log, and error handling groups',
         caption: 'The full n8n build: Lead Intake → Validate → CRM Sync (GHL) → Confirm + Log, with a dedicated error-handling lane.',
       },
@@ -318,7 +368,7 @@ export const POSTS = [
       },
       {
         type: 'img',
-        src: '/uploads/lead-capture-slack-alert.png',
+        src: '/uploads/Lead_Pipeline_Error.png',
         alt: 'Slack alert showing a lead pipeline failure with client, source, timestamp, API error, and the lead contact details',
         caption: 'The real alert: client, source, timestamp, the exact API error (a 401 from GHL), the lead’s contact info, and recovery instructions.',
       },
