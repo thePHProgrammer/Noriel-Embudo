@@ -176,6 +176,73 @@ export const POSTS = [
     ],
   },
   {
+    slug: 'rpa-to-agentic-automation',
+    title: 'From RPA to Agentic Automation: Lessons from 100,000+ Hours Saved',
+    excerpt:
+      'After shipping 70+ RPA solutions across five countries, I learned exactly where deterministic automation stops paying for itself — and how agentic AI changes the unit of work from "scripted steps" to "goal plus tools".',
+    date: '2026-06-03',
+    readTime: '7 min read',
+    tags: ['Agentic AI', 'RPA', 'UiPath', 'n8n'],
+    content: [
+      {
+        type: 'p',
+        text: 'At DFI Retail Group I built and deployed 70+ automation solutions with UiPath, Power Automate, Python, and C# across Indonesia, Hong Kong, Malaysia, Taiwan, and Vietnam — over 100,000 hours a year handed back to the business. That portfolio taught me two things: deterministic RPA is still wildly underrated, and there is a hard ceiling it will never break through. Agentic AI is what finally moved that ceiling.',
+      },
+      { type: 'h2', text: 'What Classic RPA Gets Right' },
+      {
+        type: 'p',
+        text: 'When a process is stable, rule-based, and high-volume, nothing beats a deterministic bot. It does the same thing every time, it is cheap to run, it is easy to audit, and finance can verify the savings line by line. Most of those 100,000 hours came from exactly this kind of work — invoice processing, report generation, data reconciliation between systems that were never designed to talk to each other.',
+      },
+      { type: 'h2', text: 'Where It Breaks' },
+      {
+        type: 'list',
+        items: [
+          'Brittle selectors — a vendor redesigns one screen and the bot is down until someone re-records the flow.',
+          'Unstructured input — the moment the process involves reading an email, a PDF, or a free-text field, rules explode into unmaintainable branching.',
+          'Exceptions — the bot handles the 80% happy path, and the 20% of exceptions quietly become a human queue that nobody budgeted for.',
+          'Change velocity — every process tweak is a development ticket, so the backlog grows faster than the team.',
+        ],
+      },
+      {
+        type: 'p',
+        text: 'The pattern across all four: deterministic automation encodes the steps, so anything that changes the steps breaks the automation. We were not automating the work — we were automating one snapshot of the work.',
+      },
+      { type: 'h2', text: 'The Shift: From Steps to Goals' },
+      {
+        type: 'p',
+        text: 'Agentic automation changes the unit of work. Instead of scripting "click here, copy this, paste there", you give a model a goal, a set of narrow tools, and guardrails — and it works out the steps at runtime. The email that would have broken a rules engine becomes just another input the model reads. The exception queue becomes the part the agent is best at, because exceptions are exactly the cases that need judgment instead of repetition.',
+      },
+      {
+        type: 'code',
+        lang: 'text',
+        text: 'Classic RPA:   trigger → step 1 → step 2 → ... → step N   (breaks if any step changes)\nAgentic:       trigger → goal + tools + guardrails → agent decides the steps\n                          ↳ validate output → act / escalate to human',
+      },
+      { type: 'h2', text: 'A Decision Framework' },
+      {
+        type: 'p',
+        text: 'Agentic does not replace RPA — it sits above it. This is the framework I use to decide which tool each process deserves:',
+      },
+      {
+        type: 'list',
+        items: [
+          'Stable, rule-based, high-volume → deterministic RPA. An LLM in this loop is cost and latency for nothing.',
+          'Unstructured inputs, judgment calls, natural language → agentic. This is where rules engines go to die.',
+          'High blast radius (payments, compliance, systems of record) → either approach, but always with validation and human approval gates.',
+          'Hybrid is the real answer: an agent doing the reasoning, calling deterministic workflows as its tools. The bot becomes the hands; the model becomes the dispatcher.',
+        ],
+      },
+      { type: 'h2', text: 'What I’d Tell a Team Starting Today' },
+      {
+        type: 'p',
+        text: 'Do not throw away your RPA estate — it is a library of reliable, audited tools your agents can call. Start agentic where deterministic already failed: the exception queues, the inbox triage, the processes that never got automated because they were "too messy". That is the work with no incumbent solution, the cleanest ROI story, and the fastest path to leadership trusting the approach.',
+      },
+      {
+        type: 'quote',
+        text: 'RPA automates a snapshot of the work. Agents automate the work.',
+      },
+    ],
+  },
+  {
     slug: 'document-extraction-pipeline',
     title: 'Document/Data Extraction Pipeline: PDFs In, Clean Structured Data Out (n8n + Claude/OpenAI)',
     excerpt:
