@@ -1,0 +1,241 @@
+/* ── THE WORLD ─────────────────────────────────────────────────────────── */
+#world-canvas { position: fixed; inset: 0; z-index: 0; }
+#world-canvas canvas { display: block; }
+
+.journey { position: relative; }
+.journey-main { position: relative; z-index: 1; }
+
+/* ── CHAPTERS — each owns a stretch of the flight path ─────────────────── */
+/* components.css hides bare <section>/<nav> until the legacy reveal system
+   adds .visible — neutralize that for journey elements. */
+.jch {
+  min-height: 160vh;
+  display: block; padding: 0; opacity: 1; transform: none; transition: none;
+}
+.jch--tall { min-height: 190vh; }
+#arrival { min-height: 140vh; }
+
+.jch-sticky {
+  position: sticky; top: 0; height: 100vh;
+  display: grid; place-items: center;
+  padding: clamp(1.2rem, 4vw, 4rem);
+  overflow: hidden;
+}
+.jch-inner { position: relative; width: min(1080px, 100%); text-align: center; }
+
+/* Story beats rise out of the void as their waypoint arrives. */
+.jch-inner [data-rise] {
+  opacity: 0; transform: translateY(46px);
+  transition: opacity 1.1s ease, transform 1.1s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.jch-inner.in-view [data-rise] { opacity: 1; transform: none; }
+.jch-inner.in-view [data-rise]:nth-child(2) { transition-delay: 0.15s; }
+.jch-inner.in-view [data-rise]:nth-child(3) { transition-delay: 0.3s; }
+.jch-inner.in-view [data-rise]:nth-child(4) { transition-delay: 0.45s; }
+.jch-inner.in-view [data-rise]:nth-child(5) { transition-delay: 0.6s; }
+
+/* ── OVERSIZED TYPOGRAPHY ──────────────────────────────────────────────── */
+.jch-kicker {
+  font-family: 'Space Mono', monospace; font-size: 0.78rem;
+  letter-spacing: 0.45em; text-transform: uppercase; color: var(--gold);
+  margin-bottom: 1.4rem;
+}
+
+.jch-title {
+  font-size: clamp(3rem, 11vw, 9.5rem); line-height: 0.95;
+  font-weight: 700; letter-spacing: -0.02em; text-transform: uppercase;
+  margin-bottom: 1.6rem;
+}
+.jch-title em {
+  font-style: normal;
+  background: linear-gradient(100deg, var(--gold), var(--orange) 55%, var(--cyan));
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+
+/* Giant environmental word floating behind each chapter's copy. */
+.jch-word {
+  position: absolute; left: 50%; top: 50%;
+  transform: translate(-50%, -58%);
+  font-size: clamp(5rem, 22vw, 19rem); line-height: 1;
+  font-weight: 700; text-transform: uppercase; letter-spacing: 0.02em;
+  color: transparent; -webkit-text-stroke: 1px rgba(245, 158, 11, 0.28);
+  text-shadow: 0 0 80px rgba(245, 158, 11, 0.12);
+  pointer-events: none; user-select: none; white-space: nowrap;
+  z-index: -1;
+  opacity: 0; transition: opacity 1.6s ease;
+}
+.jch-inner.in-view .jch-word { opacity: 1; }
+
+.jch-copy {
+  font-size: clamp(1.05rem, 1.8vw, 1.35rem); line-height: 1.7;
+  color: var(--text); max-width: 34ch; margin: 0 auto 2.4rem;
+}
+.jch-copy--wide { max-width: 52ch; text-shadow: 0 2px 24px rgba(6, 7, 13, 0.9); }
+
+/* ── ARRIVAL ───────────────────────────────────────────────────────────── */
+.jch-cue {
+  font-family: 'Space Mono', monospace; font-size: 0.72rem;
+  letter-spacing: 0.4em; text-transform: uppercase; color: var(--dim);
+  display: flex; flex-direction: column; align-items: center; gap: 0.9rem;
+}
+.jch-cue-line {
+  width: 1px; height: 64px;
+  background: linear-gradient(to bottom, transparent, var(--gold));
+  animation: cue-drop 2.2s ease-in-out infinite;
+}
+@keyframes cue-drop {
+  0% { transform: scaleY(0); transform-origin: top; }
+  55% { transform: scaleY(1); transform-origin: top; }
+  56% { transform-origin: bottom; }
+  100% { transform: scaleY(0); transform-origin: bottom; }
+}
+
+/* ── SIGNAL — stat monoliths ───────────────────────────────────────────── */
+.jch-stats { display: flex; justify-content: center; gap: clamp(1rem, 4vw, 3.5rem); flex-wrap: wrap; }
+.jstat {
+  display: flex; flex-direction: column; gap: 0.3rem; padding: 1.2rem 1.6rem;
+  border: 1px solid rgba(34, 211, 238, 0.2); border-radius: 10px;
+  background: rgba(13, 15, 26, 0.55); backdrop-filter: blur(6px);
+  animation: drift-bob 7s ease-in-out infinite;
+}
+.jstat:nth-child(2) { animation-delay: 1.4s; }
+.jstat:nth-child(3) { animation-delay: 2.8s; }
+.jstat strong { font-size: clamp(1.7rem, 3.4vw, 2.6rem); color: var(--cyan); font-weight: 700; }
+.jstat span {
+  font-family: 'Space Mono', monospace; font-size: 0.68rem;
+  letter-spacing: 0.25em; text-transform: uppercase; color: var(--dim);
+}
+
+/* ── FORGE — floating skill islands ────────────────────────────────────── */
+.jfloat-field {
+  display: flex; flex-wrap: wrap; justify-content: center;
+  gap: clamp(0.8rem, 2.5vw, 1.6rem);
+}
+.jfloat {
+  max-width: 250px; padding: 1.1rem 1.3rem; text-align: left;
+  border: 1px solid rgba(245, 158, 11, 0.22); border-radius: 12px;
+  background: rgba(13, 15, 26, 0.6); backdrop-filter: blur(6px);
+  animation: drift-bob 8s ease-in-out infinite; animation-delay: var(--d, 0s);
+}
+.jfloat h3 {
+  font-family: 'Space Mono', monospace; font-size: 0.72rem;
+  letter-spacing: 0.3em; text-transform: uppercase; color: var(--gold);
+  margin-bottom: 0.5rem;
+}
+.jfloat p { font-size: 0.92rem; color: var(--text); line-height: 1.55; }
+
+@keyframes drift-bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-14px); }
+}
+
+/* ── VOYAGES — expedition gates ────────────────────────────────────────── */
+.jgates { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.2rem; text-align: left; }
+.jgate {
+  padding: 1.5rem 1.4rem; border-radius: 12px;
+  border: 1px solid rgba(124, 58, 237, 0.3); border-top: 2px solid var(--gold);
+  background: linear-gradient(180deg, rgba(18, 20, 30, 0.75), rgba(13, 15, 26, 0.5));
+  backdrop-filter: blur(6px);
+  transition: transform 0.4s ease, border-color 0.4s ease;
+}
+.jgate:hover { transform: translateY(-8px); border-color: rgba(34, 211, 238, 0.5); }
+.jgate-dates {
+  font-family: 'Space Mono', monospace; font-size: 0.65rem;
+  letter-spacing: 0.2em; text-transform: uppercase; color: var(--dim);
+}
+.jgate h3 { font-size: 1.12rem; margin: 0.6rem 0 0.2rem; color: var(--text); }
+.jgate-co { font-size: 0.85rem; color: var(--gold); margin-bottom: 0.7rem; }
+.jgate-note { font-size: 0.88rem; color: var(--dim); line-height: 1.55; }
+
+/* ── FIELD NOTES ───────────────────────────────────────────────────────── */
+.jnotes { display: flex; flex-direction: column; gap: 0.4rem; max-width: 720px; margin: 0 auto; text-align: left; }
+.jnote {
+  display: flex; gap: 0.9rem; align-items: baseline;
+  padding: 0.95rem 1.2rem; border-radius: 10px;
+  color: var(--text); text-decoration: none; font-size: 1rem; line-height: 1.5;
+  border: 1px solid transparent;
+  transition: border-color 0.3s ease, background 0.3s ease, transform 0.3s ease;
+}
+.jnote:hover {
+  border-color: rgba(245, 158, 11, 0.35); background: rgba(13, 15, 26, 0.7);
+  transform: translateX(6px);
+}
+.jnote-arrow { color: var(--cyan); flex-shrink: 0; }
+
+/* ── TRANSMIT ──────────────────────────────────────────────────────────── */
+.jcontact {
+  max-width: 620px; margin: 0 auto; text-align: left;
+  background: rgba(6, 7, 13, 0.55); backdrop-filter: blur(8px);
+  border: 1px solid rgba(245, 158, 11, 0.15); border-radius: 16px;
+  padding: clamp(1.2rem, 3vw, 2rem);
+}
+.jresume {
+  display: inline-block; margin-top: 1.3rem;
+  font-family: 'Space Mono', monospace; font-size: 0.78rem;
+  letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--cyan); text-decoration: none;
+  border-bottom: 1px dashed rgba(34, 211, 238, 0.4); padding-bottom: 0.25rem;
+}
+.jresume:hover { color: var(--gold); border-color: var(--gold); }
+.jfooter {
+  margin-top: 3.2rem; padding: 0; border-top: none;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.68rem; letter-spacing: 0.3em; text-transform: uppercase;
+  color: var(--dim);
+}
+
+/* ── NAV ───────────────────────────────────────────────────────────────── */
+.jnav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 60;
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 1.1rem clamp(1.2rem, 4vw, 2.6rem);
+  background: linear-gradient(to bottom, rgba(6, 7, 13, 0.75), transparent);
+  opacity: 1; /* components.css dims bare <nav> until .visible */
+}
+.jnav-logo {
+  font-family: 'Space Mono', monospace; font-weight: 700; font-size: 0.85rem;
+  letter-spacing: 0.25em; color: var(--gold); text-decoration: none;
+}
+.jnav-links { display: flex; gap: 1.7rem; list-style: none; }
+.jnav-links a {
+  font-family: 'Space Mono', monospace; font-size: 0.7rem;
+  letter-spacing: 0.22em; text-transform: uppercase;
+  color: var(--dim); text-decoration: none; transition: color 0.3s ease;
+}
+.jnav-links a:hover { color: var(--cyan); }
+
+/* ── WAYPOINT RAIL ─────────────────────────────────────────────────────── */
+.jrail {
+  position: fixed; right: 1.6rem; top: 50%; transform: translateY(-50%);
+  z-index: 60; display: flex; flex-direction: column; gap: 1.1rem;
+}
+.jrail-dot {
+  position: relative; width: 9px; height: 9px; border-radius: 50%;
+  border: 1px solid var(--dim); background: transparent;
+  transition: background 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease;
+}
+.jrail-dot.on {
+  background: var(--gold); border-color: var(--gold);
+  box-shadow: 0 0 12px rgba(245, 158, 11, 0.8);
+}
+.jrail-dot span {
+  position: absolute; right: 1.4rem; top: 50%; transform: translateY(-50%);
+  font-family: 'Space Mono', monospace; font-size: 0.62rem;
+  letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold);
+  white-space: nowrap; opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+}
+.jrail-dot:hover span, .jrail-dot.on span { opacity: 1; }
+
+/* ── RESPONSIVE & MOTION ───────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .jnav-links { display: none; }
+  .jrail { right: 0.7rem; gap: 0.9rem; }
+  .jrail-dot span { display: none; }
+  .jch { min-height: 140vh; }
+  .jch--tall { min-height: 165vh; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .jch-inner [data-rise], .jch-word { transition: none; }
+  .jstat, .jfloat, .jch-cue-line { animation: none; }
+}
